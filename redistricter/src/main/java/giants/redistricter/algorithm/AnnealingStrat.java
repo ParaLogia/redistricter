@@ -3,10 +3,7 @@ package giants.redistricter.algorithm;
 import giants.redistricter.data.District;
 import giants.redistricter.data.State;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AnnealingStrat implements AlgorithmStrategy {
@@ -25,7 +22,7 @@ public class AnnealingStrat implements AlgorithmStrategy {
     public AnnealingStrat(State state, Variation variation, Random random){
         this.districts = state.getDistricts().stream()
                 .map(District::new)
-                .collect(Collectors.toCollection(HashSet::new));
+                .collect(Collectors.toCollection(TreeSet::new));
         this.variation = variation;
         this.random = random;
     }
@@ -54,8 +51,13 @@ public class AnnealingStrat implements AlgorithmStrategy {
     }
 
     @Override
-    public Boolean isAcceptable(Double objVal) {
-        return null;
+    public boolean isAcceptable() {
+        return true;
+    }
+
+    @Override
+    public void acceptMove(Move move) {
+
     }
 
     @Override

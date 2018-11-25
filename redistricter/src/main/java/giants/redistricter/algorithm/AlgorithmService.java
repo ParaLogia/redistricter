@@ -32,13 +32,23 @@ public class AlgorithmService {
         return strategy.getStatus();
     }
 
-    int i;
     public Move next(){
-        // FIXME temporary code
-        Move move = new Move();
-        Precinct precinct = new Precinct();
-        precinct.setId(++i);
-        move.setPrecinct(precinct);
+        if (strategy == null) {
+            return null;        // Consider throwing an exception?
+        }
+        Move move = null;
+        boolean accepted = false;
+        while (!accepted) {
+            move = strategy.generateMove();
+            strategy.executeMove(move);
+            if (strategy.isAcceptable()) {
+                strategy.acceptMove(move);
+                accepted = true;
+            } else {
+                strategy.revertMove(move);
+            }
+        }
+
         return move;
     }
 }

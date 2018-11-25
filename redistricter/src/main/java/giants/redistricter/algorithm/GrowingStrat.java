@@ -43,8 +43,13 @@ public class GrowingStrat implements AlgorithmStrategy {
     }
 
     @Override
-    public Boolean isAcceptable(Double objVal) {
-        return null;
+    public boolean isAcceptable() {
+        return true;
+    }
+
+    @Override
+    public void acceptMove(Move move) {
+
     }
 
     @Override
