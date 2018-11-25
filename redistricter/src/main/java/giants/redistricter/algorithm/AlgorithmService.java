@@ -1,16 +1,16 @@
 package giants.redistricter.algorithm;
 
 import giants.redistricter.data.District;
+import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Random;
 
 @Component
-@Scope(value="session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value="session")
 public class AlgorithmService {
     State state;
     AlgorithmStrategy strategy;
@@ -21,16 +21,24 @@ public class AlgorithmService {
         this.state = state;
         this.objFct = objFct;
 
-        if (alg == AlgorithmType.REGION_GROWING) {
-            strategy = new GrowingStrat(state, vari, rand);
-        }
-        else {
-            strategy = new AnnealingStrat(state, vari, rand);
+        switch (alg) {
+            case REGION_GROWING:
+                strategy = new GrowingStrat(state, vari, rand);
+                break;
+            case SIMULATED_ANNEALING:
+                strategy = new AnnealingStrat(state, vari, rand);
+                break;
         }
         return strategy.getStatus();
     }
 
+    int i;
     public Move next(){
-        return null;
+        // FIXME temporary code
+        Move move = new Move();
+        Precinct precinct = new Precinct();
+        precinct.setId(++i);
+        move.setPrecinct(precinct);
+        return move;
     }
 }

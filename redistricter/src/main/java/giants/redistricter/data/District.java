@@ -1,9 +1,6 @@
 package giants.redistricter.data;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class District {
     Integer id;
@@ -18,13 +15,13 @@ public class District {
 
     public District(Integer id){
         this.id = id;
-        this.precincts = new HashSet<>();
+        this.precincts = new TreeSet<>(Comparator.comparing(Precinct::getId));
         // TODO?
     }
 
     public District(District dist){
         this.id = dist.id;
-        this.precincts = new HashSet<>(dist.precincts);
+        this.precincts = new TreeSet<>(Comparator.comparing(Precinct::getId));
         // TODO
     }
 

@@ -6,6 +6,7 @@ import giants.redistricter.data.State;
 import giants.redistricter.data.StateLoaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
@@ -14,6 +15,7 @@ import java.util.Random;
 
 
 @RestController
+@Scope(value="session")
 public class MainController {
 
     @Autowired
