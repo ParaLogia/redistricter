@@ -12,6 +12,9 @@ public class District {
     Map<Demographic,Integer> demographics;
     Map<Party,Integer> votes;
 
+    public District() {
+    	
+    }
 
     public District(Integer id){
         this.id = id;
@@ -19,9 +22,15 @@ public class District {
         // TODO?
     }
 
-    public District(District dist){
-        this.id = dist.id;
-        this.precincts = new TreeSet<>(Comparator.comparing(Precinct::getId));
+    /**
+     * Constructs a District by copying attributes from another District.
+     * A new collection of precincts is created, with Precinct references retained.
+     *
+     * @param other the District whose attributes are to be copied into this one.
+     */
+    public District(District other){
+        this.id = other.id;
+        this.precincts = new TreeSet<>(other.getPrecincts());
         // TODO
     }
 
@@ -37,40 +46,20 @@ public class District {
         return precincts;
     }
 
-    public void setPrecincts(Collection<Precinct> precincts) {
-        this.precincts = precincts;
-    }
-
     public Collection<Precinct> getBorderPrecincts() {
         return borderPrecincts;
-    }
-
-    public void setBorderPrecincts(Collection<Precinct> borderPrecincts) {
-        this.borderPrecincts = borderPrecincts;
     }
 
     public Integer getPopulation() {
         return population;
     }
 
-    public void setPopulation(Integer population) {
-        this.population = population;
-    }
-
     public Double getArea() {
         return area;
     }
 
-    public void setArea(Double area) {
-        this.area = area;
-    }
-
     public Double getPerimeter() {
         return perimeter;
-    }
-
-    public void setPerimeter(Double perimeter) {
-        this.perimeter = perimeter;
     }
 
     public Map<Demographic, Integer> getDemographics() {
@@ -89,13 +78,78 @@ public class District {
         this.votes = votes;
     }
 
-    public void removePrecinct(Precinct p) {
-        return;
+    /* Precondition: precinct must be in this.precincts */
+    public void removePrecinct(Precinct precinct) {
+        int population = precinct.getPopulation();
+        double area = precinct.getArea();
+        Map<Party, Integer> votes = precinct.getVotes();
+        Map<Precinct, Border> neighbors = precinct.getNeighbors();
+        boolean borderPrecinct = false;
+
+        precincts.remove(precinct);
+        this.population -= population;
+        this.area -= area;
+        votes.forEach((party, count) -> {
+            this.votes.merge(party, count, (total, partial) -> total - partial);
+        });
+        for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
+            Precinct neighbor = entry.getKey();
+            Border border = entry.getValue();
+            if (precincts.contains(neighbor)) {
+                perimeter += border.getLength();
+                if (!borderPrecincts.contains(neighbor)) {
+                    borderPrecincts.add(neighbor);
+                }
+            } else {
+                perimeter -= border.getLength();
+                borderPrecinct = true;
+            }
+        }
+        if (borderPrecinct) {
+            borderPrecincts.remove(precinct);
+        }
     }
-    public void addPrecinct(Precinct p){
-        return;
+
+    /* Precondition: precinct must not be in this.precincts */
+    public void addPrecinct(Precinct precinct){
+        int population = precinct.getPopulation();
+        double area = precinct.getArea();
+        Map<Party, Integer> votes = precinct.getVotes();
+        Map<Precinct, Border> neighbors = precinct.getNeighbors();
+        boolean borderPrecinct = false;
+
+        precincts.add(precinct);
+        this.population += population;
+        this.area += area;
+        votes.forEach((party, count) -> {
+            this.votes.merge(party, count, (total, partial) -> total + partial);
+        });
+        for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
+            Precinct neighbor = entry.getKey();
+            Border border = entry.getValue();
+            if (this.precincts.contains(neighbor)) {
+                perimeter -= border.getLength();
+                boolean removeBorder = neighbor.getNeighbors()
+                        .keySet()
+                        .stream()
+                        .allMatch(precincts::contains);
+                if (removeBorder) {
+                    borderPrecincts.remove(neighbor);
+                }
+            } else {
+                perimeter += border.getLength();
+                borderPrecinct = true;
+            }
+        }
+        if (borderPrecinct) {
+            borderPrecincts.add(precinct);
+        }
     }
-    public void addPrecincts(Collection<Precinct> ps){
-        return;
+
+    public void addPrecincts(Collection<Precinct> precincts){
+        // Consider calculating borders lazily if performance issues occur
+        for (Precinct precinct : precincts) {
+            addPrecinct(precinct);
+        }
     }
 }
