@@ -12,6 +12,9 @@ public class District {
     Map<Demographic,Integer> demographics;
     Map<Party,Integer> votes;
 
+    public District() {
+    	
+    }
 
     public District(Integer id){
         this.id = id;
