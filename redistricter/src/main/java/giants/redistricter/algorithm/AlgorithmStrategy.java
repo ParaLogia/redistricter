@@ -8,9 +8,8 @@ public interface AlgorithmStrategy {
     Collection<District> getStatus();
     Move generateMove();
     void executeMove(Move move);
-    boolean isAcceptable();
+    public boolean isAcceptable(double objectiveValue);
     void acceptMove(Move move);
     void revertMove(Move move);
     Boolean isComplete(Double objValue);
-    District selectRandomDistrict();
 }

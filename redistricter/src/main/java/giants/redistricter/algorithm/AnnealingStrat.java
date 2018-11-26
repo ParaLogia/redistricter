@@ -51,7 +51,7 @@ public class AnnealingStrat implements AlgorithmStrategy {
     }
 
     @Override
-    public boolean isAcceptable() {
+    public boolean isAcceptable(double objectiveValue) {
         return true;
     }
 
@@ -70,8 +70,4 @@ public class AnnealingStrat implements AlgorithmStrategy {
         return null;
     }
 
-    @Override
-    public District selectRandomDistrict() {
-        return null;
-    }
 }
