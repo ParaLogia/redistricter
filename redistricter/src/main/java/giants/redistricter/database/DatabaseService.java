@@ -30,13 +30,16 @@ public class DatabaseService {
 			Map<String,Object> criteria = new HashMap<>();
 			criteria.put("stateId", stateId);
 			stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
+			if(stateRecords.isEmpty()) {
+                return null;
+            }
 			toReturn = (State)stateRecords.get(0);
 			return toReturn;
 		}
 		catch(Throwable e) {
 			System.out.println("Exception: ");
 			e.printStackTrace();
-			return toReturn;
+			return null;
 		}		
 	}	
 	
@@ -49,13 +52,16 @@ public class DatabaseService {
 				Map<String,Object> criteria = new HashMap<>();
 				criteria.put("shortName", shortName);
 				stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
+				if(stateRecords.isEmpty()) {
+				    return null;
+				}
 				toReturn = (State)stateRecords.get(0);
 				return toReturn;
 			}
 			catch(Throwable e) {
 			    System.out.println("Exception: ");
 				e.printStackTrace();
-				return toReturn;
+				return null;
 			}		
 		}	
 	
