@@ -4,11 +4,18 @@ import java.util.Map;
 
 public class ObjectiveFunctionBuilder {
     Map<ObjectiveCriteria,Double> weights;
+    ObjectiveFunction objFct;
 
     public ObjectiveFunctionBuilder addWeight(ObjectiveCriteria obj, Double weight){
-        return null;
+        weights.put(obj,weight);
+        return this;
     }
     public ObjectiveFunction build(){
-        return null;
+        if (weights.size() > 0){
+            objFct = new ObjectiveFunction(weights);
+            return objFct;
+        } else {
+            return null;
+        }
     }
 }
