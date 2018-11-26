@@ -41,7 +41,8 @@ public class AlgorithmService {
         while (!accepted) {
             move = strategy.generateMove();
             strategy.executeMove(move);
-            if (strategy.isAcceptable()) {
+            double objectiveValue = objFct.calculateObjectiveValue(strategy.getStatus());
+            if (strategy.isAcceptable(objectiveValue)) {
                 strategy.acceptMove(move);
                 accepted = true;
             } else {
