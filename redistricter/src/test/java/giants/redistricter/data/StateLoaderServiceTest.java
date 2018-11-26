@@ -1,15 +1,10 @@
 package giants.redistricter.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import gerrymandering.HibernateManager;
 import giants.redistricter.database.DatabaseService;
 
 @RunWith(MockitoJUnitRunner.class)

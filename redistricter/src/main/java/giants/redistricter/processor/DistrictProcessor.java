@@ -1,17 +1,18 @@
 package giants.redistricter.processor;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Comparator;
+import java.util.TreeSet;
 
-import gerrymandering.model.District;
+import giants.redistricter.data.District;
 
 public class DistrictProcessor {
 	
-	public Collection<giants.redistricter.data.District> processDistricts(Collection<District> districts){
-		Collection<giants.redistricter.data.District> toReturn = new HashSet<giants.redistricter.data.District>();
+	public Collection<District> processDistricts(Collection<gerrymandering.model.District> districts){
+		Collection<District> toReturn = new TreeSet<>(Comparator.comparing(District::getId));
 		giants.redistricter.data.District process;
-		for(District d : districts) {
-			process = new giants.redistricter.data.District();
+		for(gerrymandering.model.District d : districts) {
+			process = new District();
 			process.setId(d.getDistrictId());
 			toReturn.add(process);
 		}

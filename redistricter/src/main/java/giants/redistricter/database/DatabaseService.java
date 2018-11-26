@@ -1,12 +1,13 @@
 package giants.redistricter.database;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.stereotype.Service;
 
@@ -22,16 +23,14 @@ public class DatabaseService {
 	
 	//Get State by ID
 	public State getState(int stateId) {
-		List<Object> l;
-		Iterator<Object> itr;
+		List<Object> stateRecords;
 		State toReturn = new State();
 		try {
 			hb = HibernateManager.getInstance();
 			Map<String,Object> criteria = new HashMap<>();
 			criteria.put("stateId", stateId);
-			l = hb.getRecordsBasedOnCriteria(State.class, criteria);
-			itr = l.iterator();
-			toReturn = (State) itr.next();
+			stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
+			toReturn = (State)stateRecords.get(0);
 			return toReturn;
 		}
 		catch(Throwable e) {
@@ -43,20 +42,18 @@ public class DatabaseService {
 	
 	//Get State by Short Name
 		public State getState(String shortName) {
-			List<Object> l;
-			Iterator<Object> itr;
+			List<Object> stateRecords;
 			State toReturn = new State();
 			try {
 				hb = HibernateManager.getInstance();
 				Map<String,Object> criteria = new HashMap<>();
 				criteria.put("shortName", shortName);
-				l = hb.getRecordsBasedOnCriteria(State.class, criteria);
-				itr = l.iterator();
-				toReturn = (State) itr.next();
+				stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
+				toReturn = (State)stateRecords.get(0);
 				return toReturn;
 			}
 			catch(Throwable e) {
-				System.out.println("Exception: ");
+			    System.out.println("Exception: ");
 				e.printStackTrace();
 				return toReturn;
 			}		
@@ -64,15 +61,13 @@ public class DatabaseService {
 	
 	//Gets all states in DB
 	public Collection<State> getAllStates(){
-		List<Object> l;
-		Iterator<Object> itr;
-		Collection<State> toReturn = new HashSet<State>();
+		List<Object> stateRecords;
+		Collection<State> toReturn = new TreeSet<>(Comparator.comparing(State::getStateId));
 		try {
 			hb = HibernateManager.getInstance();
-			l = hb.getAllRecords(State.class);
-			itr = l.iterator();
-			while(itr.hasNext()) {
-				toReturn.add((State) itr.next());
+			stateRecords = hb.getAllRecords(State.class);
+			for(Object state : stateRecords) {
+				toReturn.add((State) state);
 			}
 			return toReturn;
 		}
@@ -84,17 +79,15 @@ public class DatabaseService {
 	}
 	
 	public Collection<District> getAllDistrictsForState(int stateId){
-		List<Object> l;
-		Iterator<Object> itr;
-		Collection<District> toReturn = new HashSet<District>();
+		List<Object> districtRecords;
+		Collection<District> toReturn = new TreeSet<>(Comparator.comparing(District::getDistrictId));
 		try {
 			hb = HibernateManager.getInstance();
 			Map<String,Object> criteria = new HashMap<>();
 			criteria.put("stateId", stateId);
-			l = hb.getRecordsBasedOnCriteria(District.class, criteria);
-			itr = l.iterator();
-			while(itr.hasNext()) {
-				toReturn.add((District) itr.next());
+			districtRecords = hb.getRecordsBasedOnCriteria(District.class, criteria);
+			for(Object district : districtRecords) {
+				toReturn.add((District) district);
 			}
 			return toReturn;
 		}
@@ -108,8 +101,6 @@ public class DatabaseService {
 	public Set<Precinct> getAllPrecinctsForState(int stateId){
 		List<Object> districtList;
 		List<Object> precinctList;
-		Iterator<Object> precinctItr;
-		Iterator<Object> districtItr;
 		District d;
 		Set<Precinct> toReturn = new HashSet<Precinct>();
 		try {
@@ -117,15 +108,13 @@ public class DatabaseService {
 			Map<String,Object> criteria = new HashMap<>();
 			criteria.put("stateId", stateId);
 			districtList = hb.getRecordsBasedOnCriteria(District.class, criteria);
-			districtItr = districtList.iterator();
-			while(districtItr.hasNext()) {
-				d = (District) districtItr.next();
+			for(Object district : districtList) {
+				d = (District)district;
 				criteria = new HashMap<>();
 				criteria.put("districtId", d.getDistrictId());
 				precinctList = hb.getRecordsBasedOnCriteria(Precinct.class, criteria);
-				precinctItr = precinctList.iterator();
-				while(precinctItr.hasNext()) {
-					toReturn.add((Precinct) precinctItr.next());
+				for(Object precinct : precinctList) {
+					toReturn.add((Precinct)precinct);
 				}			
 			}
 			return toReturn;

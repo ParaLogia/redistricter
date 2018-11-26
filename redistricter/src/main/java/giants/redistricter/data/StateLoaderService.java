@@ -1,23 +1,21 @@
 package giants.redistricter.data;
 
-import giants.redistricter.data.District;
-import giants.redistricter.data.State;
-import giants.redistricter.database.DatabaseService;
-import giants.redistricter.processor.DistrictProcessor;
-import giants.redistricter.processor.StateProcessor;
-
-import org.json.JSONObject;
-import org.springframework.stereotype.Repository;
-
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeSet;
+
+import org.springframework.stereotype.Repository;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import giants.redistricter.database.DatabaseService;
+import giants.redistricter.processor.DistrictProcessor;
+import giants.redistricter.processor.StateProcessor;
 
 
 @Repository
@@ -37,11 +35,9 @@ public class StateLoaderService {
     int i;
     // TODO decide whether to use integer IDs or Strings
     public State getState(String name) {
-        State state = new State();
-        state = checkForStateFile(name);
+        State state = checkForStateFile(name);
         if(state == null) {
-        	gerrymandering.model.State dbBean = new gerrymandering.model.State();
-        	dbBean = dbService.getState(name);
+        	gerrymandering.model.State dbBean = dbService.getState(name);
         	state = sp.processState(dbBean);    
         	ObjectMapper mapper = new ObjectMapper();
         	try {
@@ -63,31 +59,17 @@ public class StateLoaderService {
         return state;
     }
 	public State checkForStateFile(String name) {
-		BufferedReader br = null;
-        FileReader fr = null;
         StringBuilder content = new StringBuilder();
         ObjectMapper om = new ObjectMapper();
 
-        try {
-            fr = new FileReader("src/main/resources/"+name+".json");
-            br = new BufferedReader(fr);
-
+        try (BufferedReader br = new BufferedReader(new FileReader("src/main/resources/"+name+".json"))){
             String sCurrentLine;
             while ((sCurrentLine = br.readLine()) != null) {
                 content.append(sCurrentLine);
             }
         } catch (IOException e) {
         	return null;
-        } finally {
-            try {
-                if (br != null)
-                    br.close();
-                if (fr != null)
-                    fr.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
+        } 
         try {
 			State s = om.readValue(content.toString(), State.class);
 			return s;
