@@ -5,6 +5,7 @@ import java.util.*;
 public class District {
     Integer id;
     Collection<Precinct> precincts;
+    String border;
     Collection<Precinct> borderPrecincts;
     Integer population;
     Double area;
@@ -26,6 +27,15 @@ public class District {
         this.id = dist.id;
         this.precincts = new TreeSet<>(Comparator.comparing(Precinct::getId));
         // TODO
+    }
+    
+
+    public String getBorder() {
+        return border;
+    }
+    
+    public void setBorder(String border) {
+        this.border = border;
     }
 
     public Integer getId() {

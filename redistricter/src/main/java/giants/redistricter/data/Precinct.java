@@ -5,12 +5,21 @@ import java.util.Map;
 public class Precinct {
     Integer id;
     District district;
+    String border;
     Integer population;
     Map<Precinct,Border> neighbors;
     Double area;
     ElectionResult votes;
     Map<Demographic,Integer> demographics;
 
+    public String getBorder() {
+        return border;
+    }
+    
+    public void setBorder(String border) {
+        this.border = border;
+    }
+    
     public Integer getId() {
         return id;
     }

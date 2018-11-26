@@ -38,7 +38,8 @@ public class StateLoaderService {
         State state = checkForStateFile(name);
         if(state == null) {
         	gerrymandering.model.State dbBean = dbService.getState(name);
-        	state = sp.processState(dbBean);    
+        	state = sp.processState(dbBean);  
+        	attachDistrictsToState(state);
         	ObjectMapper mapper = new ObjectMapper();
         	try {
 				mapper.writeValue(new File("src\\main\\resources\\"+dbBean.getShortName()+".json"), state);
@@ -46,7 +47,9 @@ public class StateLoaderService {
 				e.printStackTrace();
 			}	
         }
-
+        
+        
+        
         Collection<District> dists = new TreeSet<>(Comparator.comparing(District::getId));
         state.setDistricts(dists);
         //FIXME temporary
@@ -58,7 +61,14 @@ public class StateLoaderService {
 
         return state;
     }
-	public State checkForStateFile(String name) {
+    
+	private void attachDistrictsToState(State state) {
+        Collection<gerrymandering.model.District> districtDbBeans = dbService.getAllDistrictsForState(state.getId());
+        Collection<District> districts = dp.processDistricts(districtDbBeans);
+        state.setDistricts(districts);
+    }
+	
+    public State checkForStateFile(String name) {
         StringBuilder content = new StringBuilder();
         ObjectMapper om = new ObjectMapper();
 
