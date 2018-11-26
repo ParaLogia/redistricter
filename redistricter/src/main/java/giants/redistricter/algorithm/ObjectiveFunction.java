@@ -11,10 +11,26 @@ public class ObjectiveFunction {
     Map<ObjectiveCriteria,Function<Collection<District>,Double>> functions;
 
     public Double calculateObjectiveValue(Collection<District> districts){
-        return null;
+        // Problems here to fix later.
+//        Map<ObjectiveCriteria,Double> objVals;
+//        functions.forEach((obj, fct) -> {
+//            objVals.put(obj, fct.apply(obj);
+//        });
+//        Double overallVal = 0.;
+//        objVals.forEach((obj,val) -> {overallVal += weights.get(obj)*val;});
+//        return overallVal;
+        return calculatePolsbyPopper(districts);
     }
     private Double calculatePolsbyPopper(Collection<District> districts){
-        return null;
+        Double total = 0.;
+        for (District dist:districts){
+            Double area = dist.getArea();
+            Double peri = dist.getPerimeter();
+            Double polsyPopper = (4*Math.PI*area)/(peri*peri);
+            total = total + polsyPopper;
+        }
+        total = (total / districts.size());
+        return total;
     }
     private Double calculateSchwartzberg(Collection<District> districts){
         return null;
