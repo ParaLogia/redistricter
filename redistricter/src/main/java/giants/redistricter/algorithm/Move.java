@@ -8,7 +8,6 @@ public class Move {
     Precinct precinct;
     District sourceDistrict;
     District destinationDistrict;
-    Border border;
 
     public void log(){
         return;
@@ -36,13 +35,5 @@ public class Move {
 
     public void setDestinationDistrict(District destinationDistrict) {
         this.destinationDistrict = destinationDistrict;
-    }
-
-    public Border getBorder() {
-        return border;
-    }
-
-    public void setBorder(Border border) {
-        this.border = border;
     }
 }
