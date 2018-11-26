@@ -9,7 +9,7 @@ public class Precinct {
     Integer population;
     Map<Precinct,Border> neighbors;
     Double area;
-    ElectionResult votes;
+    Map<Party, Integer> votes;
     Map<Demographic,Integer> demographics;
 
     public String getBorder() {
@@ -60,11 +60,11 @@ public class Precinct {
         this.area = area;
     }
 
-    public ElectionResult getVotes() {
+    public Map<Party, Integer> getVotes() {
         return votes;
     }
 
-    public void setVotes(ElectionResult votes) {
+    public void setVotes(Map<Party, Integer> votes) {
         this.votes = votes;
     }
 
