@@ -22,15 +22,11 @@ public class StateLoaderService {
 		serv.getState("NY");
 	}
 	
-	
-	
     private Map<Integer,State> states;
     DatabaseService dbService = new DatabaseService();
     StateProcessor sp = new StateProcessor();
     DistrictProcessor dp = new DistrictProcessor();
 
-    int i;
-    // TODO decide whether to use integer IDs or Strings
     public State getState(String name) {
         State state = checkForStateFile(name);
         if(state == null) {
@@ -43,15 +39,6 @@ public class StateLoaderService {
 				e.printStackTrace();
 			}	
         }
-
-        Collection<District> dists = new LinkedHashSet<>();
-        state.setDistricts(dists);
-        //FIXME temporary
-        dists.add(new District(++i));
-        dists.add(new District(++i));
-        dists.add(new District(++i));
-        dists.add(new District(++i));
-        dists.add(new District(++i));
 
         return state;
     }
