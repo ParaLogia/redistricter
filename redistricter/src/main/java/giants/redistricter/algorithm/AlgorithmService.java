@@ -1,7 +1,6 @@
 package giants.redistricter.algorithm;
 
 import giants.redistricter.data.District;
-import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,33 +22,16 @@ public class AlgorithmService {
 
         switch (alg) {
             case REGION_GROWING:
-                strategy = new GrowingStrat(state, vari, rand);
+                strategy = new GrowingStrat(state, objFct, vari, rand);
                 break;
             case SIMULATED_ANNEALING:
-                strategy = new AnnealingStrat(state, vari, rand);
+                strategy = new AnnealingStrat(state, objFct, vari, rand);
                 break;
         }
-        return strategy.getStatus();
+        return strategy.getDistricts();
     }
 
     public Move next(){
-        if (strategy == null) {
-            return null;        // Consider throwing an exception?
-        }
-        Move move = null;
-        boolean accepted = false;
-        while (!accepted) {
-            move = strategy.generateMove();
-            strategy.executeMove(move);
-            double objectiveValue = objFct.calculateObjectiveValue(strategy.getStatus());
-            if (strategy.isAcceptable(objectiveValue)) {
-                strategy.acceptMove(move);
-                accepted = true;
-            } else {
-                strategy.revertMove(move);
-            }
-        }
-
-        return move;
+        return strategy.nextMove();
     }
 }

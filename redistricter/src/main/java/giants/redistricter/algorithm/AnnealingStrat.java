@@ -1,73 +1,94 @@
 package giants.redistricter.algorithm;
 
 import giants.redistricter.data.District;
+import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class AnnealingStrat implements AlgorithmStrategy {
+public class AnnealingStrat extends AlgorithmStrategy {
 
-    Set<District> districts;
-    Random random;
-    Integer iterations;
-    Integer MAX_ITERATIONS;
-    Double DELTA_OBJ_VALUE;
-    Double temperature;
     Variation variation;
-    Double currentObjValue;
-    Double currObjValDelta;
+    Random random;
+    Set<District> districts;
+    int iterations = 0;
+    final int MAX_ITERATIONS = 5000;
+    final double CONVERGED_DELTA_VAL = 0.01;
+    double temperature = 1.0;
+    double currentObjValue = 0.0;
+    double previousObjValue = 0.0;
+    double currObjValDelta = Double.MAX_VALUE;
     List<Move> moves;
 
-    public AnnealingStrat(State state, Variation variation, Random random){
+    public AnnealingStrat(State state, ObjectiveFunction objFct, Variation variation, Random random){
+        this.state = state;
+        this.objFct = objFct;
+        this.variation = variation;
+        this.random = random;
         this.districts = state.getDistricts().stream()
                 .map(District::new)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-        this.variation = variation;
-        this.random = random;
-    }
-
-    private Boolean checkIterations(){
-        return false;
-    }
-
-    private Boolean checkDeltaObj(Double objVal){
-        return false;
     }
 
     @Override
-    public Set<District> getStatus() {
+    public Set<District> getDistricts() {
         return this.districts;
     }
 
     @Override
     public Move generateMove() {
-        return null;
+        District srcDistrict;
+        Precinct precinct;
+        District destDistrict = null;
+        Move move;
+
+        srcDistrict = RandomService.select(districts, random);
+        precinct = RandomService.select(srcDistrict.getBorderPrecincts(), random);
+        // Consider storing a lookup table to map precincts to their districts
+        for (District district : districts) {
+            if (district.getPrecincts().contains(precinct)) {
+                destDistrict = district;
+                break;
+            }
+        }
+        if (destDistrict == null) {
+            assert false : "Precinct without district: " + precinct;
+        }
+
+        move = new Move();
+        move.setSourceDistrict(srcDistrict);
+        move.setPrecinct(precinct);
+        move.setDestinationDistrict(destDistrict);
+        return move;
     }
 
     @Override
-    public void executeMove(Move move) {
+    public boolean isAcceptable() {
+        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
+        switch (this.variation) {
+            case GREEDY_ACCEPT:
+                return currentObjValue > previousObjValue;
 
-    }
+            case PROBABILISTIC_ACCEPT:
+                return previousObjValue == 0
+                        || currentObjValue / previousObjValue > temperature;
 
-    @Override
-    public boolean isAcceptable(double objectiveValue) {
-        return true;
+            default:
+                assert false : "Invalid Variation";
+                return false;
+        }
     }
 
     @Override
     public void acceptMove(Move move) {
-
+        previousObjValue = currentObjValue;
+        temperature -= COOLING_RATE;
     }
 
     @Override
-    public void revertMove(Move move) {
-
+    public boolean isComplete() {
+        return iterations > MAX_ITERATIONS
+                || currObjValDelta < CONVERGED_DELTA_VAL;
     }
-
-    @Override
-    public Boolean isComplete(Double objValue) {
-        return null;
-    }
-
 }
