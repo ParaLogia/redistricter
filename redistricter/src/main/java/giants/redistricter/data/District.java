@@ -128,6 +128,8 @@ public class District {
         Map<Party, Integer> votes = precinct.getVotes();
         Map<Precinct, Border> neighbors = precinct.getNeighbors();
         boolean borderPrecinct = false;
+        //don't add for remove, or it might break some other code. Just becareful.
+        precinct.setDistrict(this);
 
         precincts.add(precinct);
         this.population += population;
