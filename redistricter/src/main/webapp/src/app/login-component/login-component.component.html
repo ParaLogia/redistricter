@@ -1,0 +1,40 @@
+<mat-toolbar style="display: flex;">
+    <span>District Generator</span>
+    
+    <a routerLink="/" style="margin-left: auto;">
+    <button mat-raised-button color="primary">Home Page</button>
+  </a>
+  </mat-toolbar>
+<div sws-parallax everything-center-container class="demo-bg">
+
+<div m-t-100 everything-center-container>
+  <mat-card style="width: 400px;" everything-center-container>
+    <mat-card-header>
+      <h3><b> Admin Login </b></h3>
+    </mat-card-header>
+    <mat-card-content m-l-15>
+      <p *ngIf="showInvalidLoginAlert" style="color: red">**Invalid Login Information. Please try again.**</p>
+      <form class="example-form">
+        <table class="example-full-width" cellspacing="0">
+          <tr>
+            <td>
+              <mat-form-field style="width: 300px;">
+                <input [(ngModel)]="adminService.admin.username" matInput placeholder="Username" name="username" required style="width: 300px;">
+              </mat-form-field>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <mat-form-field style="width: 300px;">
+                <input [(ngModel)]="adminService.admin.password" matInput placeholder="Password" type="password" name="password" required style="width: 300px;">
+              </mat-form-field>
+            </td>
+          </tr>
+        </table>
+      </form>
+
+      <button mat-raised-button color="primary" (click)="validateAdmin();"> Login </button>
+    </mat-card-content>
+  </mat-card>
+</div>
+</div>

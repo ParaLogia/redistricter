@@ -1,0 +1,90 @@
+<mat-toolbar style="display: flex;">
+  <a routerLink="/"> <button mat-raised-button color="primary">Go To Home</button> </a>
+  <button mat-raised-button color="primary" style="margin-left: auto;" routerLink="/" (click)="adminService.logout()">Log Out</button>
+</mat-toolbar>
+
+<div everything-center-container m-t-80>
+  <mat-card style="width: 500px;">
+    <h2>Welcome, Admin</h2>
+    <p>Here you can configure which objective measures are available</p>
+    <div sws-card--square style="width:100%; height: 200px;">
+      <div sws-card__content>
+        <div style="background: #673AB7 ">
+          <h4 m-b-10 style="color: white;">Population</h4>
+        </div>
+        <div sws-button-group--primary>
+          <h3 class="text-field-admin">Maximum Difference</h3>
+          <input id="yeah01" type="radio" name="testgroup01" tabindex="0" checked>
+          <label for="yeah01">Enabled</label>
+
+          <input id="no01" type="radio" name="testgroup01" tabindex="0">
+          <label for="no01">Disabled</label>
+        </div>
+        <div sws-button-group--primary>
+          <h3 class="text-field-admin">Minimum Difference</h3>
+          <input id="yeah02" type="radio" name="testgroup02" tabindex="0" checked>
+          <label for="yeah02">Enabled</label>
+
+          <input id="no02" type="radio" name="testgroup02" tabindex="0">
+          <label for="no02">Disabled</label>
+        </div>
+      </div>
+    </div>
+
+    <div sws-card--square style="width:100%; height: 250px;">
+      <div sws-card__content>
+        <div style="background: #673AB7 ">
+          <h4 m-b-10 style="color: white;">Partisan Fairness</h4>
+        </div>
+        <div sws-button-group--primary>
+          <h3 class="text-field-admin">Efficiency Gap</h3>
+          <input id="yeah03" type="radio" name="testgroup03" tabindex="0" checked>
+          <label for="yeah03">Enabled</label>
+
+          <input id="no03" type="radio" name="testgroup03" tabindex="0">
+          <label for="no03">Disabled</label>
+        </div>
+        <div sws-button-group--primary>
+          <h3 class="text-field-admin">Proportionality</h3>
+          <input id="yeah04" type="radio" name="testgroup04" tabindex="0" checked>
+          <label for="yeah04">Enabled</label>
+
+          <input id="no04" type="radio" name="testgroup04" tabindex="0">
+          <label for="no04">Disabled</label>
+        </div>
+        <div sws-button-group--primary>
+          <h3 class="text-field-admin">Mean-Median Difference</h3>
+          <input id="yeah05" type="radio" name="testgroup05" tabindex="0" checked>
+          <label for="yeah05">Enabled</label>
+
+          <input id="no05" type="radio" name="testgroup05" tabindex="0">
+          <label for="no05">Disabled</label>
+        </div>
+      </div>
+    </div>
+    <div sws-card--square style="width:100%; height: 250px;">
+      <div sws-card__content>
+        <div style="background: #673AB7 ">
+          <h4 m-b-10 style="color: white;">Compactness</h4>
+        </div>
+        <div sws-button-group--primary>
+          <h3 class="text-field-admin">Polsby-Popper</h3>
+          <input id="yeah06" type="radio" name="testgroup06" tabindex="0" checked>
+          <label for="yeah06">Enabled</label>
+
+          <input id="no06" type="radio" name="testgroup06" tabindex="0">
+          <label for="no06">Disabled</label>
+        </div>
+        <div sws-button-group--primary>
+            <h3 class="text-field-admin">Schwartzberg</h3>
+            <input id="yeah07" type="radio" name="testgroup07" tabindex="0" checked>
+            <label for="yeah07">Enabled</label>
+  
+            <input id="no07" type="radio" name="testgroup07" tabindex="0">
+            <label for="no07">Disabled</label>
+          </div>
+      </div>
+    </div>
+
+  </mat-card>
+</div>
