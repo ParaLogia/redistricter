@@ -45,59 +45,59 @@ public class ObjectiveFunction {
         });
     }
 
-    public Double calculateObjectiveValue(Set<District> districts){
-        Double overallVal = 0.0;
+    public double calculateObjectiveValue(Set<District> districts){
+        double overallVal = 0.0;
 
         for (Map.Entry<ObjectiveCriteria, Function<Set<District>, Double>> entry
                 : functions.entrySet()) {
             ObjectiveCriteria criteria = entry.getKey();
             Function<Set<District>, Double> function = entry.getValue();
-            Double val = function.apply(districts);
+            double val = function.apply(districts);
             overallVal += weights.get(criteria) * val;
         }
         return overallVal;
     }
 
-    private Double calculatePolsbyPopper(Set<District> districts){
-        Double total = 0.;
+    private double calculatePolsbyPopper(Set<District> districts){
+        double total = 0.;
         for (District dist:districts){
-            Double area = dist.getArea();
-            Double perimeter = dist.getPerimeter();
-            Double polsyPopper = (4*Math.PI*area)/(perimeter*perimeter);
+            double area = dist.getArea();
+            double perimeter = dist.getPerimeter();
+            double polsyPopper = (4*Math.PI*area)/(perimeter*perimeter);
             total = total + polsyPopper;
         }
         total = (total / districts.size());
         return total;
     }
 
-    private Double calculateSchwartzberg(Set<District> districts){
-        return null;
+    private double calculateSchwartzberg(Set<District> districts){
+        return 0.0;
     }
-    private Double calculateReock(Set<District> districts){
-        return null;
+    private double calculateReock(Set<District> districts){
+        return 0.0;
     }
-    private Double calculateXSymmetry(Set<District> districts){
-        return null;
+    private double calculateXSymmetry(Set<District> districts){
+        return 0.0;
     }
-    private Double calculateSignificantCorners(Set<District> districts){
-        return null;
+    private double calculateSignificantCorners(Set<District> districts){
+        return 0.0;
     }
-    private Double calculateBoyceClark(Set<District> districts){
-        return null;
+    private double calculateBoyceClark(Set<District> districts){
+        return 0.0;
     }
-    private Double calculateLengthWidth(Set<District> districts){
-        return null;
+    private double calculateLengthWidth(Set<District> districts){
+        return 0.0;
     }
-    private Double calculatePopulationFairness(Set<District> districts){
-        return null;
+    private double calculatePopulationFairness(Set<District> districts){
+        return 0.0;
     }
-    private Double calculateEfficiencyGap(Set<District> districts){
-        return null;
+    private double calculateEfficiencyGap(Set<District> districts){
+        return 0.0;
     }
-    private Double calculateMeanMedian(Set<District> districts){
-        return null;
+    private double calculateMeanMedian(Set<District> districts){
+        return 0.0;
     }
-    private Double calculateProportionality(Set<District> districts){
-        return null;
+    private double calculateProportionality(Set<District> districts){
+        return 0.0;
     }
 }
