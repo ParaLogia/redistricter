@@ -33,7 +33,12 @@ public class District {
         this.id = other.id;
         this.precincts = new LinkedHashSet<>(other.getPrecincts());
         this.borderPrecincts = new LinkedHashSet<>(other.getBorderPrecincts());
-        // TODO
+        this.border = other.border;
+        this.population = other.population;
+        this.area =  other.area;
+        this.perimeter = other.perimeter;
+        this.demographics = new Map<Demographic,Integer>(other.getDemographics());
+        this.votes = new Map<Party,Integer>(other.getVotes());
     }
 
 
