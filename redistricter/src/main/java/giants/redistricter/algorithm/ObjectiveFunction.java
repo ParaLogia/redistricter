@@ -2,6 +2,7 @@ package giants.redistricter.algorithm;
 
 import giants.redistricter.data.District;
 
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Map;
 import java.util.function.Function;
@@ -12,6 +13,7 @@ public class ObjectiveFunction {
     
     public ObjectiveFunction(Map<ObjectiveCriteria, Double> weights) {
         this.weights = weights;
+        functions = new LinkedHashMap<>();
         weights.forEach((obj,weight)->{
             switch(obj){
                 case POLSBY_POPPER: functions.put(ObjectiveCriteria.POLSBY_POPPER,this::calculatePolsbyPopper); break;
