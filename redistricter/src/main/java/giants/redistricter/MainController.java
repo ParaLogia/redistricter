@@ -35,10 +35,12 @@ public class MainController {
         Map<String, Object> map = parser.parseMap(data);
 
         State state = stateLoader.getState((String) map.get("state"));
-        // TODO read weights from JSON
-        ObjectiveFunction objFct = new ObjectiveFunctionBuilder()
-                .addWeight(ObjectiveCriteria.valueOf("POLSBY_POPPER"), 1.0)
-                .build();
+        Map<String, Double> weights = (Map) map.get("weights");
+        ObjectiveFunctionBuilder objectiveBuilder = new ObjectiveFunctionBuilder();
+        weights.forEach((criteria, weight) -> {
+            objectiveBuilder.addWeight(ObjectiveCriteria.valueOf(criteria), weight);
+        });
+        ObjectiveFunction objFct = objectiveBuilder.build();
         AlgorithmType alg = AlgorithmType.valueOf((String) map.get("algorithm"));
         Variation variation = Variation.valueOf((String) map.get("variation"));
         Random rand = new Random(Long.parseLong(String.valueOf(map.get("seed"))));
