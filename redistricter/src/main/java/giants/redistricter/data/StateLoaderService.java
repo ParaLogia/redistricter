@@ -19,9 +19,9 @@ import giants.redistricter.processor.StateProcessor;
 public class StateLoaderService {
 	public static void main(String[] args) {
 		StateLoaderService serv = new StateLoaderService();
-		serv.getState("NY");
+		serv.getState("AZ");
 	}
-	
+
     private Map<Integer,State> states;
     DatabaseService dbService = new DatabaseService();
     StateProcessor sp = new StateProcessor();
@@ -31,7 +31,11 @@ public class StateLoaderService {
         State state = checkForStateFile(name);
         if(state == null) {
         	gerrymandering.model.State dbBean = dbService.getState(name);
-        	state = sp.processState(dbBean);    
+        	if(dbBean == null) {
+        	    return new State();
+        	}
+        	state = sp.processState(dbBean);
+        	attachDistrictsToState(state);
         	ObjectMapper mapper = new ObjectMapper();
         	try {
 				mapper.writeValue(new File("src\\main\\resources\\"+dbBean.getShortName()+".json"), state);
@@ -42,7 +46,14 @@ public class StateLoaderService {
 
         return state;
     }
-	public State checkForStateFile(String name) {
+
+	private void attachDistrictsToState(State state) {
+        Set<gerrymandering.model.District> districtDbBeans = dbService.getAllDistrictsForState(state.getId());
+        Set<District> districts = dp.processDistricts(districtDbBeans);
+        state.setDistricts(districts);
+    }
+
+    public State checkForStateFile(String name) {
         StringBuilder content = new StringBuilder();
         ObjectMapper om = new ObjectMapper();
 

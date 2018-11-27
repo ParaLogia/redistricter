@@ -23,13 +23,16 @@ public class DatabaseService {
 			Map<String,Object> criteria = new HashMap<>();
 			criteria.put("stateId", stateId);
 			stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
+			if(stateRecords.isEmpty()) {
+                return null;
+            }
 			toReturn = (State)stateRecords.get(0);
 			return toReturn;
 		}
 		catch(Throwable e) {
 			System.out.println("Exception: ");
 			e.printStackTrace();
-			return toReturn;
+			return null;
 		}		
 	}	
 	
@@ -42,20 +45,23 @@ public class DatabaseService {
 				Map<String,Object> criteria = new HashMap<>();
 				criteria.put("shortName", shortName);
 				stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
+				if(stateRecords.isEmpty()) {
+				    return null;
+				}
 				toReturn = (State)stateRecords.get(0);
 				return toReturn;
 			}
 			catch(Throwable e) {
 			    System.out.println("Exception: ");
 				e.printStackTrace();
-				return toReturn;
+				return null;
 			}		
 		}	
 	
 	//Gets all states in DB
-	public Collection<State> getAllStates(){
+	public Set<State> getAllStates(){
 		List<Object> stateRecords;
-		Collection<State> toReturn = new LinkedHashSet<>();
+		Set<State> toReturn = new LinkedHashSet<>();
 		try {
 			hb = HibernateManager.getInstance();
 			stateRecords = hb.getAllRecords(State.class);
@@ -71,9 +77,9 @@ public class DatabaseService {
 		}
 	}
 	
-	public Collection<District> getAllDistrictsForState(int stateId){
+	public Set<District> getAllDistrictsForState(int stateId){
 		List<Object> districtRecords;
-		Collection<District> toReturn = new LinkedHashSet<>();
+		Set<District> toReturn = new LinkedHashSet<>();
 		try {
 			hb = HibernateManager.getInstance();
 			Map<String,Object> criteria = new HashMap<>();

@@ -6,6 +6,7 @@ public class District {
     Integer id;
     Set<Precinct> precincts;
     Set<Precinct> borderPrecincts;
+    String border;
     Integer population;
     Double area;
     Double perimeter;
@@ -33,6 +34,15 @@ public class District {
         this.precincts = new LinkedHashSet<>(other.getPrecincts());
         this.borderPrecincts = new LinkedHashSet<>(other.getBorderPrecincts());
         // TODO
+    }
+
+
+    public String getBorder() {
+        return border;
+    }
+
+    public void setBorder(String border) {
+        this.border = border;
     }
 
     public Integer getId() {
