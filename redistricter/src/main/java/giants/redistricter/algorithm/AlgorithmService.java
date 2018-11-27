@@ -1,7 +1,6 @@
 package giants.redistricter.algorithm;
 
 import giants.redistricter.data.District;
-import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -29,7 +28,7 @@ public class AlgorithmService {
                 strategy = new AnnealingStrat(state, objFct, vari, rand);
                 break;
         }
-        return strategy.getStatus();
+        return strategy.getDistricts();
     }
 
     public Move next(){

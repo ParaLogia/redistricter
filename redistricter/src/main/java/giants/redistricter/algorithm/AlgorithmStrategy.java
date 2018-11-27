@@ -11,12 +11,12 @@ public abstract class AlgorithmStrategy {
     State state;
     ObjectiveFunction objFct;
 
-    abstract Set<District> getStatus();
+    abstract Set<District> getDistricts();
     abstract Move generateMove();
     abstract boolean isAcceptable();
     abstract void acceptMove(Move move);
     abstract boolean isComplete();
-    
+
     Move nextMove() {
         Move move = null;
 

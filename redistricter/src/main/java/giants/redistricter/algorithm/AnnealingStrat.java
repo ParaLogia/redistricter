@@ -12,11 +12,13 @@ public class AnnealingStrat extends AlgorithmStrategy {
     Variation variation;
     Random random;
     Set<District> districts;
-    Integer iterations;
-    final double DELTA_OBJ_VALUE = 0.01;
-    double temperature;
-    double currentObjValue;
-    double currObjValDelta;
+    int iterations = 0;
+    final int MAX_ITERATIONS = 5000;
+    final double CONVERGED_DELTA_VAL = 0.01;
+    double temperature = 1.0;
+    double currentObjValue = 0.0;
+    double previousObjValue = 0.0;
+    double currObjValDelta = Double.MAX_VALUE;
     List<Move> moves;
 
     public AnnealingStrat(State state, ObjectiveFunction objFct, Variation variation, Random random){
@@ -29,37 +31,64 @@ public class AnnealingStrat extends AlgorithmStrategy {
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
-    private boolean checkIterations(){
-        return false;
-    }
-
-    private boolean checkDeltaObj(double objVal){
-        return false;
-    }
-
     @Override
-    public Set<District> getStatus() {
+    public Set<District> getDistricts() {
         return this.districts;
     }
 
     @Override
     public Move generateMove() {
-        return null;
+        District srcDistrict;
+        Precinct precinct;
+        District destDistrict = null;
+        Move move;
+
+        srcDistrict = RandomService.select(districts, random);
+        precinct = RandomService.select(srcDistrict.getBorderPrecincts(), random);
+        // Consider storing a lookup table to map precincts to their districts
+        for (District district : districts) {
+            if (district.getPrecincts().contains(precinct)) {
+                destDistrict = district;
+                break;
+            }
+        }
+        if (destDistrict == null) {
+            assert false : "Precinct without district: " + precinct;
+        }
+
+        move = new Move();
+        move.setSourceDistrict(srcDistrict);
+        move.setPrecinct(precinct);
+        move.setDestinationDistrict(destDistrict);
+        return move;
     }
 
     @Override
     public boolean isAcceptable() {
-        return true;
+        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
+        switch (this.variation) {
+            case GREEDY_ACCEPT:
+                return currentObjValue > previousObjValue;
+
+            case PROBABILISTIC_ACCEPT:
+                return previousObjValue == 0
+                        || currentObjValue / previousObjValue > temperature;
+
+            default:
+                assert false : "Invalid Variation";
+                return false;
+        }
     }
 
     @Override
     public void acceptMove(Move move) {
-
+        previousObjValue = currentObjValue;
+        temperature -= COOLING_RATE;
     }
 
     @Override
     public boolean isComplete() {
-        return true;
+        return iterations > MAX_ITERATIONS
+                || currObjValDelta < CONVERGED_DELTA_VAL;
     }
-
 }

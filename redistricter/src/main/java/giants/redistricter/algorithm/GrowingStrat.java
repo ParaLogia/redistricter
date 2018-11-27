@@ -41,12 +41,13 @@ public class GrowingStrat extends AlgorithmStrategy {
     }
 
     @Override
-    public Set<District> getStatus() {
+    public Set<District> getDistricts() {
         // Consider returning the precinct pool as well?
         return districts;
     }
 
-    private District getLowestPopDistrict(){
+    private District getDistrictToGrow(){
+        // TODO get queue of possible moves (in case lowest pop. can't grow)
         return districts.stream()
                 .min(Comparator.comparing(District::getPopulation))
                 .get();
@@ -54,8 +55,7 @@ public class GrowingStrat extends AlgorithmStrategy {
 
     @Override
     public Move generateMove() {
-        // TODO get queue of possible moves (in case lowest pop. can't grow)
-        District smallDistrict = getLowestPopDistrict();
+        District smallDistrict = getDistrictToGrow();
         Precinct borderPrecinct;
         List<Precinct> addablePrecincts;
         Precinct precinctToAdd;
@@ -76,15 +76,14 @@ public class GrowingStrat extends AlgorithmStrategy {
 
     @Override
     public boolean isAcceptable() {
-        double objectiveValue = objFct.calculateObjectiveValue(getStatus());
-        currentObjValue = objectiveValue;
+        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
         switch (this.variation) {
             case GREEDY_ACCEPT:
-                return objectiveValue > previousObjValue;
+                return currentObjValue > previousObjValue;
 
             case PROBABILISTIC_ACCEPT:
                 return previousObjValue == 0
-                    || objectiveValue / previousObjValue > temperature;
+                        || currentObjValue / previousObjValue > temperature;
 
             default:
                 assert false : "Invalid Variation";
