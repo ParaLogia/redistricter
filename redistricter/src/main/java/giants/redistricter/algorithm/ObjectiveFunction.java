@@ -6,27 +6,39 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Map;
 import java.util.function.Function;
+import static giants.redistricter.algorithm.ObjectiveCriteria.*;
 
 public class ObjectiveFunction {
     private Map<ObjectiveCriteria, Double> weights;
     private Map<ObjectiveCriteria,Function<Set<District>,Double>> functions;
-    
+
     public ObjectiveFunction(Map<ObjectiveCriteria, Double> weights) {
         this.weights = weights;
         functions = new LinkedHashMap<>();
         weights.forEach((obj,weight)->{
             switch(obj){
-                case POLSBY_POPPER: functions.put(ObjectiveCriteria.POLSBY_POPPER,this::calculatePolsbyPopper); break;
-                case REOCK: functions.put(ObjectiveCriteria.REOCK,this::calculateReock); break;
-                case X_SYMMETRY: functions.put(ObjectiveCriteria.X_SYMMETRY,this::calculateXSymmetry); break;
-                case SCHWARTZBERG: functions.put(ObectiveCriteria.SCHWARTZBERG,this::calculateSchwartzberg); break;
-                case SIGNIFICANT_CORNERS: functions.put(ObjectiveCriteria.SIGNIFICANT_CORNERS,this::calculateSignificantCorners); break;
-                case BOYCE_CLARK: functions.put(ObjectiveCriteria.BOYCE_CLARK,this::calculateBoyceClark); break;
-                case LENGTH_WIDTHS: functions.put(ObjectiveCriteria.LENGTH_WIDTHS,this::calculateLengthWidth); break;
-                case POPULATION_FAIRNESS: functions.put(ObjectiveCriteria.POPULATION_FAIRNESS,this::calculatePopulationFairness); break;
-                case EFFICIENCY_GAP: functions.put(ObjectiveCriteria.EFFICIENCY_GAP,this::calculateEfficiencyGap); break;
-                case MEAN_MEDIAN: functions.put(ObjectiveCriteria.MEAN_MEDIAN,this::calculateMeanMedian); break;
-                case PROPORTIONALITY: functions.put(ObjectiveCriteria.PROPORTIONALITY,this::calculateProportionality); break;
+                case POLSBY_POPPER:
+                    functions.put(POLSBY_POPPER,this::calculatePolsbyPopper); break;
+                case REOCK:
+                    functions.put(REOCK,this::calculateReock); break;
+                case X_SYMMETRY:
+                    functions.put(X_SYMMETRY,this::calculateXSymmetry); break;
+                case SCHWARTZBERG:
+                    functions.put(SCHWARTZBERG,this::calculateSchwartzberg); break;
+                case SIGNIFICANT_CORNERS:
+                    functions.put(SIGNIFICANT_CORNERS,this::calculateSignificantCorners); break;
+                case BOYCE_CLARK:
+                    functions.put(BOYCE_CLARK,this::calculateBoyceClark); break;
+                case LENGTH_WIDTHS:
+                    functions.put(LENGTH_WIDTHS,this::calculateLengthWidth); break;
+                case POPULATION_FAIRNESS:
+                    functions.put(POPULATION_FAIRNESS,this::calculatePopulationFairness); break;
+                case EFFICIENCY_GAP:
+                    functions.put(EFFICIENCY_GAP,this::calculateEfficiencyGap); break;
+                case MEAN_MEDIAN:
+                    functions.put(MEAN_MEDIAN,this::calculateMeanMedian); break;
+                case PROPORTIONALITY:
+                    functions.put(PROPORTIONALITY,this::calculateProportionality); break;
                 default: //some error here
                     break;
             }
