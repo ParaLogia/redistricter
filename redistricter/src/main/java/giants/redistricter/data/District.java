@@ -33,7 +33,12 @@ public class District {
         this.id = other.id;
         this.precincts = new LinkedHashSet<>(other.getPrecincts());
         this.borderPrecincts = new LinkedHashSet<>(other.getBorderPrecincts());
-        // TODO
+        this.border = other.border;
+        this.population = other.population;
+        this.area =  other.area;
+        this.perimeter = other.perimeter;
+        this.demographics = new HashMap<Demographic,Integer>(other.getDemographics());
+        this.votes = new HashMap<Party,Integer>(other.getVotes());
     }
 
 
@@ -123,6 +128,8 @@ public class District {
         Map<Party, Integer> votes = precinct.getVotes();
         Map<Precinct, Border> neighbors = precinct.getNeighbors();
         boolean borderPrecinct = false;
+        //don't add for remove, or it might break some other code. Just becareful.
+        precinct.setDistrict(this);
 
         precincts.add(precinct);
         this.population += population;
