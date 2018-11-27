@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class ObjectiveFunction {
-    Map<ObjectiveCriteria, Double> weights;
-    Map<ObjectiveCriteria,Function<Collection<District>,Double>> functions;
+    private Map<ObjectiveCriteria, Double> weights;
+    private Map<ObjectiveCriteria,Function<Collection<District>,Double>> functions;
     
     public ObjectiveFunction(Map<ObjectiveCriteria, Double> weights) {
         this.weights = weights;
@@ -24,27 +24,30 @@ public class ObjectiveFunction {
     }
 
     public Double calculateObjectiveValue(Collection<District> districts){
-        // Problems here to fix later.
-//        Map<ObjectiveCriteria,Double> objVals;
-//        functions.forEach((obj, fct) -> {
-//            objVals.put(obj, fct.apply(obj);
-//        });
-//        Double overallVal = 0.;
-//        objVals.forEach((obj,val) -> {overallVal += weights.get(obj)*val;});
-//        return overallVal;
-        return calculatePolsbyPopper(districts);
+        Double overallVal = 0.0;
+
+        for (Map.Entry<ObjectiveCriteria, Function<Collection<District>, Double>> entry
+                : functions.entrySet()) {
+            ObjectiveCriteria criteria = entry.getKey();
+            Function<Collection<District>, Double> function = entry.getValue();
+            Double val = function.apply(districts);
+            overallVal += weights.get(criteria) * val;
+        }
+        return overallVal;
     }
+
     private Double calculatePolsbyPopper(Collection<District> districts){
         Double total = 0.;
         for (District dist:districts){
             Double area = dist.getArea();
-            Double peri = dist.getPerimeter();
-            Double polsyPopper = (4*Math.PI*area)/(peri*peri);
+            Double perimeter = dist.getPerimeter();
+            Double polsyPopper = (4*Math.PI*area)/(perimeter*perimeter);
             total = total + polsyPopper;
         }
         total = (total / districts.size());
         return total;
     }
+
     private Double calculateSchwartzberg(Collection<District> districts){
         return null;
     }
