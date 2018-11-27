@@ -4,8 +4,8 @@ import java.util.*;
 
 public class District {
     Integer id;
-    Collection<Precinct> precincts;
-    Collection<Precinct> borderPrecincts;
+    Set<Precinct> precincts;
+    Set<Precinct> borderPrecincts;
     Integer population;
     Double area;
     Double perimeter;
@@ -13,24 +13,25 @@ public class District {
     Map<Party,Integer> votes;
 
     public District() {
-    	
+        this.precincts = new LinkedHashSet<>();
+        this.borderPrecincts = new LinkedHashSet<>();
     }
 
     public District(Integer id){
+        this();
         this.id = id;
-        this.precincts = new TreeSet<>(Comparator.comparing(Precinct::getId));
-        // TODO?
     }
 
     /**
      * Constructs a District by copying attributes from another District.
-     * A new collection of precincts is created, with Precinct references retained.
+     * A new set of precincts is created, with Precinct references retained.
      *
      * @param other the District whose attributes are to be copied into this one.
      */
     public District(District other){
         this.id = other.id;
-        this.precincts = new TreeSet<>(other.getPrecincts());
+        this.precincts = new LinkedHashSet<>(other.getPrecincts());
+        this.borderPrecincts = new LinkedHashSet<>(other.getBorderPrecincts());
         // TODO
     }
 
@@ -42,11 +43,11 @@ public class District {
         this.id = id;
     }
 
-    public Collection<Precinct> getPrecincts() {
+    public Set<Precinct> getPrecincts() {
         return precincts;
     }
 
-    public Collection<Precinct> getBorderPrecincts() {
+    public Set<Precinct> getBorderPrecincts() {
         return borderPrecincts;
     }
 
@@ -97,17 +98,12 @@ public class District {
             Border border = entry.getValue();
             if (precincts.contains(neighbor)) {
                 perimeter += border.getLength();
-                if (!borderPrecincts.contains(neighbor)) {
-                    borderPrecincts.add(neighbor);
-                }
+                borderPrecincts.add(neighbor);
             } else {
                 perimeter -= border.getLength();
-                borderPrecinct = true;
             }
         }
-        if (borderPrecinct) {
-            borderPrecincts.remove(precinct);
-        }
+        borderPrecincts.remove(precinct);
     }
 
     /* Precondition: precinct must not be in this.precincts */
@@ -138,11 +134,8 @@ public class District {
                 }
             } else {
                 perimeter += border.getLength();
-                borderPrecinct = true;
+                borderPrecincts.add(precinct);
             }
-        }
-        if (borderPrecinct) {
-            borderPrecincts.add(precinct);
         }
     }
 

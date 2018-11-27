@@ -9,9 +9,9 @@ import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 
 @RestController
@@ -30,7 +30,7 @@ public class MainController {
     }
 
     @RequestMapping(path = "/start", method = RequestMethod.POST, consumes = "application/json")
-    public Collection<District> start(@RequestBody String data) {
+    public Set<District> start(@RequestBody String data) {
         JacksonJsonParser parser = new JacksonJsonParser();
         Map<String, Object> map = parser.parseMap(data);
 

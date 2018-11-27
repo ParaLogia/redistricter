@@ -4,15 +4,12 @@ import giants.redistricter.data.District;
 import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GrowingStrat implements AlgorithmStrategy {
     State state;
-    Collection<District> districts;
+    Set<District> districts;
     Random random;
     District precinctPool;
     Double temperature;
@@ -24,7 +21,7 @@ public class GrowingStrat implements AlgorithmStrategy {
     Double currObjValDelta;
 
     public GrowingStrat(State state, Variation variation, Random rand){
-        Collection<Precinct> precincts = state.getPrecincts();
+        Set<Precinct> precincts = state.getPrecincts();
         precinctPool = new District(-1);
         temperature = 1.0;
         currentObjValue = 0.0;
@@ -40,7 +37,7 @@ public class GrowingStrat implements AlgorithmStrategy {
     private void initSeeds(){
         /* Choose one random precinct from each of the original districts.
          * This approach is subject to change. */
-        districts = new ArrayList<>();
+        districts = new LinkedHashSet<>();
         for (District origDist : state.getDistricts()) {
             District district = new District(origDist.getId());
             Precinct seed = RandomService.select(origDist.getPrecincts(), random);
@@ -50,7 +47,7 @@ public class GrowingStrat implements AlgorithmStrategy {
     }
 
     @Override
-    public Collection<District> getStatus() {
+    public Set<District> getStatus() {
         // Consider returning the precinct pool as well?
         return districts;
     }
@@ -65,7 +62,7 @@ public class GrowingStrat implements AlgorithmStrategy {
     public Move generateMove() {
         District smallDistrict = getLowestPopDistrict();
         Precinct borderPrecinct;
-        Collection<Precinct> addablePrecincts;
+        List<Precinct> addablePrecincts;
         Precinct precinctToAdd;
         Move move;
 

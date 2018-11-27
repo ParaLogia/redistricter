@@ -6,8 +6,8 @@ import giants.redistricter.data.State;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.Random;
+import java.util.Set;
 
 @Component
 @Scope(value="session")
@@ -16,8 +16,8 @@ public class AlgorithmService {
     AlgorithmStrategy strategy;
     ObjectiveFunction objFct;
 
-    public Collection<District> start(State state, ObjectiveFunction objFct,
-                                      AlgorithmType alg, Variation vari, Random rand){
+    public Set<District> start(State state, ObjectiveFunction objFct,
+                               AlgorithmType alg, Variation vari, Random rand){
         this.state = state;
         this.objFct = objFct;
 

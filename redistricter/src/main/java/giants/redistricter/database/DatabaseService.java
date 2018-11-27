@@ -1,13 +1,6 @@
 package giants.redistricter.database;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.springframework.stereotype.Service;
 
@@ -62,7 +55,7 @@ public class DatabaseService {
 	//Gets all states in DB
 	public Collection<State> getAllStates(){
 		List<Object> stateRecords;
-		Collection<State> toReturn = new TreeSet<>(Comparator.comparing(State::getStateId));
+		Collection<State> toReturn = new LinkedHashSet<>();
 		try {
 			hb = HibernateManager.getInstance();
 			stateRecords = hb.getAllRecords(State.class);
@@ -80,7 +73,7 @@ public class DatabaseService {
 	
 	public Collection<District> getAllDistrictsForState(int stateId){
 		List<Object> districtRecords;
-		Collection<District> toReturn = new TreeSet<>(Comparator.comparing(District::getDistrictId));
+		Collection<District> toReturn = new LinkedHashSet<>();
 		try {
 			hb = HibernateManager.getInstance();
 			Map<String,Object> criteria = new HashMap<>();
@@ -102,7 +95,7 @@ public class DatabaseService {
 		List<Object> districtList;
 		List<Object> precinctList;
 		District d;
-		Set<Precinct> toReturn = new HashSet<Precinct>();
+		Set<Precinct> toReturn = new LinkedHashSet<>();
 		try {
 			hb = HibernateManager.getInstance();
 			Map<String,Object> criteria = new HashMap<>();
@@ -110,7 +103,7 @@ public class DatabaseService {
 			districtList = hb.getRecordsBasedOnCriteria(District.class, criteria);
 			for(Object district : districtList) {
 				d = (District)district;
-				criteria = new HashMap<>();
+				criteria.clear();
 				criteria.put("districtId", d.getDistrictId());
 				precinctList = hb.getRecordsBasedOnCriteria(Precinct.class, criteria);
 				for(Object precinct : precinctList) {

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class AnnealingStrat implements AlgorithmStrategy {
 
-    Collection<District> districts;
+    Set<District> districts;
     Random random;
     Integer iterations;
     Integer MAX_ITERATIONS;
@@ -22,7 +22,7 @@ public class AnnealingStrat implements AlgorithmStrategy {
     public AnnealingStrat(State state, Variation variation, Random random){
         this.districts = state.getDistricts().stream()
                 .map(District::new)
-                .collect(Collectors.toCollection(TreeSet::new));
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         this.variation = variation;
         this.random = random;
     }
@@ -36,7 +36,7 @@ public class AnnealingStrat implements AlgorithmStrategy {
     }
 
     @Override
-    public Collection<District> getStatus() {
+    public Set<District> getStatus() {
         return this.districts;
     }
 

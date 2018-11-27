@@ -1,14 +1,14 @@
 package giants.redistricter.data;
 
-import java.util.Collection;
+import java.util.Set;
 
 public class State {
     String name;
     Integer id;
-    Collection<District> districts;
-    Collection<Precinct> precincts;
+    Set<District> districts;
+    Set<Precinct> precincts;
     Integer population;
-    Collection<ElectionResult> votes;
+    Set<ElectionResult> votes;
 
     public String getName() {
         return name;
@@ -26,19 +26,19 @@ public class State {
         this.id = id;
     }
 
-    public Collection<District> getDistricts() {
+    public Set<District> getDistricts() {
         return districts;
     }
 
-    public void setDistricts(Collection<District> districts) {
+    public void setDistricts(Set<District> districts) {
         this.districts = districts;
     }
 
-    public Collection<Precinct> getPrecincts() {
+    public Set<Precinct> getPrecincts() {
         return precincts;
     }
 
-    public void setPrecincts(Collection<Precinct> precincts) {
+    public void setPrecincts(Set<Precinct> precincts) {
         this.precincts = precincts;
     }
 
@@ -50,11 +50,11 @@ public class State {
         this.population = population;
     }
 
-    public Collection<ElectionResult> getVotes() {
+    public Set<ElectionResult> getVotes() {
         return votes;
     }
 
-    public void setVotes(Collection<ElectionResult> votes) {
+    public void setVotes(Set<ElectionResult> votes) {
         this.votes = votes;
     }
 }
