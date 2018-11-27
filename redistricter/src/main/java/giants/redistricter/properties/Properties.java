@@ -6,11 +6,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Properties {
-    Map<TextProperty,String> props;
+    Map<TextProperty,String> props = new HashMap<>();
 
     public void loadProps(File file){
         String json;
