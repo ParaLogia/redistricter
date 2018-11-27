@@ -37,8 +37,8 @@ public class District {
         this.population = other.population;
         this.area =  other.area;
         this.perimeter = other.perimeter;
-        this.demographics = new Map<Demographic,Integer>(other.getDemographics());
-        this.votes = new Map<Party,Integer>(other.getVotes());
+        this.demographics = new HashMap<Demographic,Integer>(other.getDemographics());
+        this.votes = new HashMap<Party,Integer>(other.getVotes());
     }
 
 
