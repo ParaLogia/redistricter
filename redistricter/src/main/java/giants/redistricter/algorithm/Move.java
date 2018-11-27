@@ -1,9 +1,12 @@
 package giants.redistricter.algorithm;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import giants.redistricter.data.Border;
 import giants.redistricter.data.District;
 import giants.redistricter.data.Precinct;
+import giants.redistricter.serialize.MoveSerializer;
 
+@JsonSerialize(using = MoveSerializer.class)
 public class Move {
     Precinct precinct;
     District sourceDistrict;
