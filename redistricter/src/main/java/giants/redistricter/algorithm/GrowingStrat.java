@@ -7,36 +7,30 @@ import giants.redistricter.data.State;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class GrowingStrat implements AlgorithmStrategy {
-    State state;
+public class GrowingStrat extends AlgorithmStrategy {
     Set<District> districts;
     Random random;
     District precinctPool;
-    Double temperature;
+    double temperature;
     Variation variation;
-    final Double DELTA_OBJ_VALUE;
-    final Double COOLING_RATE;
-    Double previousObjValue;
-    Double currentObjValue;
-    Double currObjValDelta;
+    double previousObjValue;
+    double currentObjValue;
 
-    public GrowingStrat(State state, Variation variation, Random rand){
+    public GrowingStrat(State state, ObjectiveFunction objFct, Variation variation, Random random){
+        this.state = state;
+        this.objFct = objFct;
+        this.variation = variation;
+        this.random = random;
         Set<Precinct> precincts = state.getPrecincts();
         precinctPool = new District(-1);
         temperature = 1.0;
         currentObjValue = 0.0;
-
-        // FIXME load constants from elsewhere?
-        DELTA_OBJ_VALUE = 0.01;
-        COOLING_RATE = 0.05;
 
         precinctPool.addPrecincts(precincts);
         initSeeds();
     }
 
     private void initSeeds(){
-        /* Choose one random precinct from each of the original districts.
-         * This approach is subject to change. */
         districts = new LinkedHashSet<>();
         for (District origDist : state.getDistricts()) {
             District district = new District(origDist.getId());
@@ -60,6 +54,7 @@ public class GrowingStrat implements AlgorithmStrategy {
 
     @Override
     public Move generateMove() {
+        // TODO get queue of possible moves (in case lowest pop. can't grow)
         District smallDistrict = getLowestPopDistrict();
         Precinct borderPrecinct;
         List<Precinct> addablePrecincts;
@@ -80,18 +75,8 @@ public class GrowingStrat implements AlgorithmStrategy {
     }
 
     @Override
-    public void executeMove(Move move) {
-        District srcDistrict = move.getSourceDistrict();
-        District destDistrict = move.getDestinationDistrict();
-        Precinct precinct = move.getPrecinct();
-
-        srcDistrict.removePrecinct(precinct);
-        destDistrict.addPrecinct(precinct);
-    }
-
-    @Override
-    public boolean isAcceptable(double objectiveValue) {
-        // TODO move objective function calculation into this class
+    public boolean isAcceptable() {
+        double objectiveValue = objFct.calculateObjectiveValue(getStatus());
         currentObjValue = objectiveValue;
         switch (this.variation) {
             case GREEDY_ACCEPT:
@@ -114,18 +99,7 @@ public class GrowingStrat implements AlgorithmStrategy {
     }
 
     @Override
-    public void revertMove(Move move) {
-        District srcDistrict = move.getSourceDistrict();
-        District destDistrict = move.getDestinationDistrict();
-        Precinct precinct = move.getPrecinct();
-
-        destDistrict.addPrecinct(precinct);
-        srcDistrict.removePrecinct(precinct);
-    }
-
-    @Override
-    public Boolean isComplete(Double objValue) {
-        return (currObjValDelta < DELTA_OBJ_VALUE)
-                || precinctPool.getPrecincts().isEmpty();
+    public boolean isComplete() {
+        return precinctPool.getPrecincts().isEmpty();
     }
 }
