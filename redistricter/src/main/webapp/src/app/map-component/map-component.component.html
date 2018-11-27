@@ -1,0 +1,284 @@
+<mat-toolbar style="display: flex;">
+  <span>District Generator</span>
+  <a
+    *ngIf="!adminService.isLoggedIn"
+    routerLink="/login"
+    style="margin-left: auto;"
+  >
+    <button mat-raised-button color="primary">Admin Login</button>
+  </a>
+  <a style="margin-left: auto;" *ngIf="adminService.isLoggedIn">
+    <button (click)="adminService.logout()" mat-raised-button color="primary">
+      Log Out
+    </button>
+  </a>
+</mat-toolbar>
+<div id="mapid"></div>
+<form #theForm="ngForm" name="form" id="form">
+  <div>
+    <mat-card m-b-20 style="height:8w0px;">
+      <div m-r-30>
+        <mat-form-field style="width:300px;" m-l-30>
+          <mat-select
+            name="stateDDL"
+            [(ngModel)]="stateService.state.name"
+            placeholder="Selected State"
+            (selectionChange)="changeStateGeo(state)"
+          >
+            <mat-option
+              id="{{state.name}}"
+              *ngFor="let state of statesDDL"
+              [value]="state.name"
+            >
+              {{ state.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div *ngIf="enablePrecinctToggle" m-l-30>
+          <button m-l-30
+          mat-raised-button
+          color="primary"
+          (click)="toggleDisplayPrecincts()"
+        >Show Precincts </button>
+      
+      </div>
+    </mat-card>
+  </div>
+
+  <div>
+    <mat-card>
+      <mat-tab-group>
+        <mat-tab label="Information">
+          <div m-l-30>
+            <h3><b>State: </b>{{ stateService.state.name }}</h3>
+            <p><b>Population: </b> {{ stateService.state.population }}</p>
+            <p><b>Votes: </b> {{ stateService.state.votes }}</p>
+            <p>
+              <b>Number of Precincts: </b> {{ stateService.state.numPrecincts }}
+            </p>
+            <p>
+              <b>Objective Performance: </b>
+              {{ stateService.state.objFunction }}
+            </p>
+            <p><b>Current Senators: </b>{{ stateService.state.senatorsStr }}</p>
+            <!-- <p><b>Current Representatives:</b></p> -->
+          </div>
+          <div>
+            <table
+              class="mdl-data-table mdl-js-data-table mdl-data-table mdl-shadow--2dp"
+              m-l-30
+              *ngIf="showPrecinctTable"
+            >
+              <thead>
+                <tr>
+                  <th class="mdl-data-table__cell--non-numeric">
+                    <h4 style="color:black">Precinct Information</h4>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td
+                    class="mdl-data-table__cell--non-numeric"
+                    style="width:250px;"
+                  >
+                    <b>ID Number: </b>
+                  </td>
+                  <td style="width:300px;">
+                    {{ this.stateService.selectedPrecinct.id }}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="mdl-data-table__cell--non-numeric">
+                    <b>Population: </b>
+                  </td>
+                  <td>{{ this.stateService.selectedPrecinct.population }}</td>
+                </tr>
+                <tr>
+                  <td class="mdl-data-table__cell--non-numeric">
+                    <b>Party: </b>
+                  </td>
+                  <td>{{ this.stateService.selectedPrecinct.party }}</td>
+                </tr>
+                <tr>
+                  <td class="mdl-data-table__cell--non-numeric">
+                    <b>District ID: </b>
+                  </td>
+                  <td>{{ this.stateService.selectedPrecinct.districtId }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </mat-tab>
+        <mat-tab label="Objectives">
+          <div m-l-30>
+            <p>
+              Select values for the following objectives. This will determine
+              how much each term matters to the algorithm. Mouse over the
+              <i class="fas fa-info-circle"></i> icon for more info.
+            </p>
+            <h4>Population</h4>
+            <div sws-hr-sm--bold></div>
+            <span>
+              <p>Maximum Difference <i class="fas fa-info-circle"></i></p>
+            </span>
+            <mat-slider
+              thumbLabel
+              style="width: 300px;"
+              [disabled]="this.lockObjectives"
+              [displayWith]="percentFormat"
+              min="0"
+              max="100"
+              tickInterval="1"
+            ></mat-slider>
+
+            <p>Maximum Variance <i class="fas fa-info-circle"></i></p>
+            <mat-slider
+              thumbLabel
+              style="width: 300px;"
+              [disabled]="this.lockObjectives"
+              [displayWith]="percentFormat"
+              min="0"
+              max="100"
+              tickInterval="1"
+            ></mat-slider>
+
+            <h4>Partisan Fairness</h4>
+            <div sws-hr-sm--bold></div>
+            <p>Efficiency Gap <i class="fas fa-info-circle"></i></p>
+            <mat-slider
+              thumbLabel
+              style="width: 300px;"
+              [disabled]="this.lockObjectives"
+              [displayWith]="percentFormat"
+              min="0"
+              max="100"
+              tickInterval="1"
+            ></mat-slider>
+
+            <p>Proportionality <i class="fas fa-info-circle"></i></p>
+            <mat-slider
+              thumbLabel
+              style="width: 300px;"
+              [disabled]="this.lockObjectives"
+              [displayWith]="percentFormat"
+              min="0"
+              max="100"
+              tickInterval="1"
+            ></mat-slider>
+
+            <p>Mean-Median Difference <i class="fas fa-info-circle"></i></p>
+            <mat-slider
+              thumbLabel
+              style="width: 300px;"
+              [disabled]="this.lockObjectives"
+              [displayWith]="percentFormat"
+              min="0"
+              max="100"
+              tickInterval="1"
+            ></mat-slider>
+
+            <h4>Compactness</h4>
+            <div sws-hr-sm--bold></div>
+            <p>Polsby-Popper <i class="fas fa-info-circle"></i></p>
+            <mat-slider
+              thumbLabel
+              style="width: 300px;"
+              [disabled]="this.lockObjectives"
+              [displayWith]="percentFormat"
+              min="0"
+              max="100"
+              tickInterval="1"
+            ></mat-slider>
+          </div>
+        </mat-tab>
+        <mat-tab label="Algorithm">
+          <div m-l-30>
+            <h4>Please select your algorithm</h4>
+            <mat-form-field m-r-20>
+              <mat-select
+                placeholder="Algorithm"
+                name="algoDDL"
+                id="algoDDL"
+                [(ngModel)]="selectedAlgorithm"
+              >
+                <mat-option *ngFor="let algo of algorithms" [value]="algo">
+                  {{ algo }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <span *ngIf="!algorithmInProgress"
+              ><button
+                mat-raised-button
+                color="primary"
+                [disabled]="selectedAlgorithm === undefined"
+                (click)="startAlgorithm()"
+              >
+                Start
+              </button></span
+            >
+            <span *ngIf="algorithmInProgress"
+              ><button
+                mat-raised-button
+                color="warn"
+                [disabled]="selectedAlgorithm === undefined"
+                (click)="pauseAlgorithm()"
+              >
+                Pause
+              </button></span
+            >
+
+            <div>
+              <mat-form-field m-r-20>
+                <input
+                  matInput
+                  placeholder="Random Seed"
+                  type="number"
+                  maxlength="16"
+                  [disabled]="this.lockObjectives"
+                  [value]="randomSeed"
+                />
+              </mat-form-field>
+              <span
+                ><button
+                  mat-raised-button
+                  color="primary"
+                  (click)="generateRandomSeed()"
+                >
+                  Generate
+                </button></span
+              >
+            </div>
+
+            <h4>Configurations</h4>
+            <p>Export or import your algorithm configuration information</p>
+            <button m-r-40 mat-raised-button color="primary">Export</button>
+            <button mat-raised-button color="primary">Import</button>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="About">
+          <div m-l-30>
+            <h4>How to Run</h4>
+            <p>
+              Please select an algorithm for redistricting. In order to run the
+              algorithm, please select a weighting for the variables in the
+              objective function.
+            </p>
+            <h4>Group Information</h4>
+            <div>
+              The district generator project for CSE 308. The group consists of:
+            </div>
+            <ul>
+              <li>Alex Wojno</li>
+              <li>Philip Huang</li>
+              <li>Darren Ling</li>
+              <li>Matthew Argyropoulos</li>
+            </ul>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card>
+  </div>
+</form>

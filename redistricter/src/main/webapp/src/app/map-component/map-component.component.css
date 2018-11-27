@@ -1,0 +1,26 @@
+#mapid { 
+    height: 100%; 
+    width: 60%;
+    float:left;
+}
+
+::ng-deep .mat-accent .mat-slider-thumb {
+    background-color: purple;
+} 
+::ng-deep .mat-accent .mat-slider-thumb-label {
+    background-color: purple;
+} 
+::ng-deep .mat-accent .mat-slider-thumb-label-text {
+    color: white;
+} 
+::ng-deep .mat-accent .mat-slider-track-fill {
+    background-color: purple;
+} 
+
+mat-accent .mat-slider-thumb-label-text
+
+.map {
+    height: 100%;
+    padding: 0;
+  }
+  
