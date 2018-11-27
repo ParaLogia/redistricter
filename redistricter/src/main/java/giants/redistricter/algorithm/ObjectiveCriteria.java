@@ -9,4 +9,7 @@ public enum ObjectiveCriteria {
     BOYCE_CLARK,
     LENGTH_WIDTHS,
     POPULATION_FAIRNESS;
+    EFFICIENCY_GAP;
+    MEAN_MEDIAN;
+    PROPORTIONALITY;
 }
