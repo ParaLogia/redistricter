@@ -44,6 +44,9 @@ public abstract class AlgorithmStrategy {
 
         srcDistrict.removePrecinct(precinct);
         destDistrict.addPrecinct(precinct);
+        //update other things later too like demograhpics
+        destDistrict.setArea(destDistrict.getArea() + precinct.getArea());
+        srcDistrict.setArea(srcDistrict.getArea() - precinct.getArea());
     }
 
     void revertMove(Move move) {
@@ -53,5 +56,7 @@ public abstract class AlgorithmStrategy {
 
         srcDistrict.addPrecinct(precinct);
         destDistrict.removePrecinct(precinct);
+        destDistrict.setArea(destDistrict.getArea() - precinct.getArea());
+        srcDistrict.setArea(srcDistrict.getArea() + precinct.getArea());
     }
 }
