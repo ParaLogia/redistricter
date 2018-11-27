@@ -4,10 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.springframework.stereotype.Repository;
 
@@ -47,7 +44,7 @@ public class StateLoaderService {
 			}	
         }
 
-        Collection<District> dists = new TreeSet<>(Comparator.comparing(District::getId));
+        Collection<District> dists = new LinkedHashSet<>();
         state.setDistricts(dists);
         //FIXME temporary
         dists.add(new District(++i));

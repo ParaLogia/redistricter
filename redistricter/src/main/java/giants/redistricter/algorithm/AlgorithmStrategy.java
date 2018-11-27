@@ -2,10 +2,10 @@ package giants.redistricter.algorithm;
 
 import giants.redistricter.data.District;
 
-import java.util.Collection;
+import java.util.Set;
 
 public interface AlgorithmStrategy {
-    Collection<District> getStatus();
+    Set<District> getStatus();
     Move generateMove();
     void executeMove(Move move);
     public boolean isAcceptable(double objectiveValue);

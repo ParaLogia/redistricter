@@ -1,10 +1,10 @@
 package giants.redistricter.algorithm;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ObjectiveFunctionBuilder {
-    Map<ObjectiveCriteria,Double> weights = new HashMap<>();
+    Map<ObjectiveCriteria,Double> weights = new LinkedHashMap<>();
     ObjectiveFunction objFct;
 
     public ObjectiveFunctionBuilder addWeight(ObjectiveCriteria obj, Double weight){
