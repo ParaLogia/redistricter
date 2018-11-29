@@ -2,6 +2,7 @@ package giants.redistricter.algorithm;
 
 import giants.redistricter.data.District;
 import giants.redistricter.data.State;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -11,21 +12,22 @@ import java.util.Set;
 @Component
 @Scope(value="session")
 public class AlgorithmService {
+
     State state;
     AlgorithmStrategy strategy;
     ObjectiveFunction objFct;
 
     public Set<District> start(State state, ObjectiveFunction objFct,
-                               AlgorithmType alg, Variation vari, Random rand){
+                               AlgorithmType alg, Variation vari){
         this.state = state;
         this.objFct = objFct;
 
         switch (alg) {
             case REGION_GROWING:
-                strategy = new GrowingStrat(state, objFct, vari, rand);
+                strategy = new GrowingStrat(state, objFct, vari);
                 break;
             case SIMULATED_ANNEALING:
-                strategy = new AnnealingStrat(state, objFct, vari, rand);
+                strategy = new AnnealingStrat(state, objFct, vari);
                 break;
         }
         return strategy.getDistricts();

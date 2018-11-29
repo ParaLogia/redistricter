@@ -24,6 +24,9 @@ public class MainController {
     @Autowired
     AlgorithmService algorithm;
 
+    @Autowired
+    RandomService randomService;
+
     @RequestMapping(path = "/select")
     public State select(@RequestParam String state) {
         return stateLoader.getState(state);
@@ -43,9 +46,10 @@ public class MainController {
         ObjectiveFunction objFct = objectiveBuilder.build();
         AlgorithmType alg = AlgorithmType.valueOf((String) map.get("algorithm"));
         Variation variation = Variation.valueOf((String) map.get("variation"));
-        Random rand = new Random(Long.parseLong(String.valueOf(map.get("seed"))));
+        long seed = Long.parseLong(String.valueOf(map.get("seed")));
+        randomService.setSeed(seed);
 
-        return algorithm.start(state, objFct, alg, variation, rand);
+        return algorithm.start(state, objFct, alg, variation);
     }
 
     @RequestMapping(path = "/next")
