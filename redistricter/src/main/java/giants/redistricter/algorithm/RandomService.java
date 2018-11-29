@@ -9,16 +9,11 @@ import java.util.Random;
 
 @Component
 @Scope(value="session")
-public class RandomService {
-    private Random random;
-
-    public void setSeed(long seed) {
-        random = new Random(seed);
-    }
+public class RandomService extends Random {
 
     /* Note that the time complexity may be up to O(n). */
     public <E> E select(Collection<E> collection) {
-        int index = random.nextInt(collection.size());
+        int index = nextInt(collection.size());
 
         if (collection instanceof List) {
             return ((List<E>) collection).get(index);
