@@ -17,7 +17,8 @@ public class DatabaseService {
 	//Get State by ID
 	public State getState(int stateId) {
 		List<Object> stateRecords;
-		State toReturn = new State();
+		State toReturn;
+
 		try {
 			hb = HibernateManager.getInstance();
 			Map<String,Object> criteria = new HashMap<>();
@@ -37,26 +38,27 @@ public class DatabaseService {
 	}	
 	
 	//Get State by Short Name
-		public State getState(String shortName) {
-			List<Object> stateRecords;
-			State toReturn = new State();
-			try {
-				hb = HibernateManager.getInstance();
-				Map<String,Object> criteria = new HashMap<>();
-				criteria.put("shortName", shortName);
-				stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
-				if(stateRecords.isEmpty()) {
-				    return null;
-				}
-				toReturn = (State)stateRecords.get(0);
-				return toReturn;
-			}
-			catch(Throwable e) {
-			    System.out.println("Exception: ");
-				e.printStackTrace();
+	public State getState(String shortName) {
+		List<Object> stateRecords;
+		State toReturn;
+
+		try {
+			hb = HibernateManager.getInstance();
+			Map<String,Object> criteria = new HashMap<>();
+			criteria.put("shortName", shortName);
+			stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
+			if(stateRecords.isEmpty()) {
 				return null;
-			}		
-		}	
+			}
+			toReturn = (State)stateRecords.get(0);
+			return toReturn;
+		}
+		catch(Throwable e) {
+			System.out.println("Exception: ");
+			e.printStackTrace();
+			return null;
+		}
+	}
 	
 	//Gets all states in DB
 	public Set<State> getAllStates(){

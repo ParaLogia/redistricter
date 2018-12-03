@@ -14,7 +14,7 @@ public class DistrictProcessor {
 		for(gerrymandering.model.District d : districts) {
 			process = new District();
 			process.setId(d.getDistrictId());
-			process.setBorder(d.getBoundary());
+			process.setBorder(d.getBoundaryJSON());
 			toReturn.add(process);
 		}
 		return toReturn;
