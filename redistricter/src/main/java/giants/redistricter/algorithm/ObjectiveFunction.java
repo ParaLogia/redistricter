@@ -85,7 +85,7 @@ public class ObjectiveFunction {
     }
     private double calculateSignificantCorners(Set<District> districts){
         //count the number of “significant” corners. The more significant corners, the less compact the district by this metric.
-        //we have to define significant corners and normalize it. 
+        //we have to define significant corners and normalize it.
         return 0.0;
     }
     private double calculateBoyceClark(Set<District> districts){
@@ -97,7 +97,19 @@ public class ObjectiveFunction {
         return 0.0;
     }
     private double calculatePopulationFairness(Set<District> districts){
-        return 0.0;
+        //no access to state so extra code.
+        int populationPerDistrict;
+        int totalPopulation = 0;
+        double total = 0.0;
+        for (District district:districts) {
+            totalPopulation += district.getPopulation();
+        }
+        populationPerDistrict = totalPopulation/districts.size();
+        for (District district:districts){
+            total += Math.abs((populationPerDistrict - district.getPopulation()));
+        }
+        total = total/totalPopulation;
+        return total;
     }
     private double calculateEfficiencyGap(Set<District> districts){
         return 0.0;
