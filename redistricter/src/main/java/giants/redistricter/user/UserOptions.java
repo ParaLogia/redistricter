@@ -10,9 +10,9 @@ public class UserOptions {
         return;
     }
     public Boolean get(String option){
-        return false;
+        return options.get(option);
     }
     public void set(String option,Boolean value){
-        return;
+        options.put(option,value);
     }
 }
