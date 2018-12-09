@@ -72,7 +72,7 @@ export class MapComponentComponent implements OnInit {
 
       {
         attribution:
-          'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+          'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery � <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 18,
         id: "mapbox.streets",
         accessToken:
@@ -109,6 +109,15 @@ export class MapComponentComponent implements OnInit {
   public startAlgorithm() {
     this.algorithmInProgress = true;
     this.lockObjectives = true;
+    // this.http.post(environment.apiBaseUrl + "/main/start", this.stateService.state).toPromise()
+    //   .then( (res) => {
+    //     // Algo return set of districts
+    //     this.initializeDistricts(res);
+    //   },
+    //   // If an error occurs, log it
+    //   (err) => {
+    //     console.log("error: " + err);
+    //   }) 
   }
 
   public pauseAlgorithm() {
@@ -117,6 +126,8 @@ export class MapComponentComponent implements OnInit {
   }
 
   public generateRandomSeed() {}
+  
+  public initializeDistricts(districtData: any) {}
 
   public changeStateGeo(e) {
     this.enablePrecinctToggle = true;
@@ -151,7 +162,7 @@ export class MapComponentComponent implements OnInit {
     this.stateService.state.votes = 253062;
     this.stateService.state.objFunction = 0.96;
     this.stateService.state.senatorsStr = "Maggie Hassan, Jeanne Shaheen";
-    this.stateService.state.numPrecincts = this.statesData.features[29].geometry.coordinates[0].length;
+    this.stateService.state.numPrecincts = this.statesData.features[stateIndex].geometry.coordinates[0].length;
   }
 
   public processCoordinates(index: number): any[] {
@@ -204,6 +215,8 @@ export class MapComponentComponent implements OnInit {
 
     this.enablePrecinctToggle = false;
   }
+  
+  
 
   public onEachFeature(feature, layer) {
     console.log("Hello");
