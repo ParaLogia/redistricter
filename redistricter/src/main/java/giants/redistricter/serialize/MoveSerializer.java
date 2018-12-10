@@ -19,8 +19,8 @@ public class MoveSerializer extends JsonSerializer<Move> {
 
         jsonGenerator.writeStartObject();
         jsonGenerator.writeNumberField("precinct", precinct.getId());
-        jsonGenerator.writeNumberField("sourceDistrict", srcDistrict.getId());
-        jsonGenerator.writeNumberField("destinationDistrict", destDistrict.getId());
+        jsonGenerator.writeNumberField("sourceDistrict", srcDistrict.getDistrictId());
+        jsonGenerator.writeNumberField("destinationDistrict", destDistrict.getDistrictId());
         jsonGenerator.writeEndObject();
     }
 }

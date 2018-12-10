@@ -26,7 +26,7 @@ public class MainController {
 
     @RequestMapping(path = "/select")
     public State select(@RequestParam String state) {
-        return stateLoader.getState(state);
+        return stateLoader.getStateByShortName(state);
     }
 
     @RequestMapping(path = "/start", method = RequestMethod.POST, consumes = "application/json")
@@ -34,7 +34,7 @@ public class MainController {
         JacksonJsonParser parser = new JacksonJsonParser();
         Map<String, Object> map = parser.parseMap(data);
 
-        State state = stateLoader.getState((String) map.get("state"));
+        State state = stateLoader.getStateByShortName((String) map.get("state"));
         Map<String, Double> weights = (Map) map.get("weights");
         ObjectiveFunctionBuilder objectiveBuilder = new ObjectiveFunctionBuilder();
         weights.forEach((criteria, weight) -> {

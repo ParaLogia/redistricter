@@ -2,15 +2,44 @@ package giants.redistricter.data;
 
 import java.util.*;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name = "DISTRICT")
 public class District {
-    Integer id;
-    Set<Precinct> precincts;
-    Set<Precinct> borderPrecincts;
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY, generator = "DISTRICT_ID")
+    @SequenceGenerator(name = "DISTIRCT_ID", sequenceName = "DISTRICT_ID")
+    
+    @Column(name = "DISTRICT_ID")
+    Integer districtId;
+    
+    @Column(name = "STATE_ID")
+    Integer stateId;
+
+    @Column(name = "GEO_DATA")
     String border;
+    
+    @Transient
     Integer population;
+    @Transient
+    Set<Precinct> precincts;
+    @Transient
+    Set<Precinct> borderPrecincts;
+    @Transient
     Double area;
+    @Transient
     Double perimeter;
+    @Transient
     Map<Demographic,Integer> demographics;
+    @Transient
     Map<Party,Integer> votes;
 
     public District() {
@@ -20,7 +49,7 @@ public class District {
 
     public District(Integer id){
         this();
-        this.id = id;
+        this.districtId = id;
     }
 
     /**
@@ -30,7 +59,7 @@ public class District {
      * @param other the District whose attributes are to be copied into this one.
      */
     public District(District other){
-        this.id = other.id;
+        this.districtId = other.districtId;
         this.precincts = new LinkedHashSet<>(other.getPrecincts());
         this.borderPrecincts = new LinkedHashSet<>(other.getBorderPrecincts());
         this.border = other.border;
@@ -41,6 +70,33 @@ public class District {
         this.votes = new HashMap<Party,Integer>(other.getVotes());
     }
 
+    public Integer getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(Integer stateId) {
+        this.stateId = stateId;
+    }
+
+    public void setPopulation(Integer population) {
+        this.population = population;
+    }
+
+    public void setPrecincts(Set<Precinct> precincts) {
+        this.precincts = precincts;
+    }
+
+    public void setBorderPrecincts(Set<Precinct> borderPrecincts) {
+        this.borderPrecincts = borderPrecincts;
+    }
+
+    public void setArea(Double area) {
+        this.area = area;
+    }
+
+    public void setPerimeter(Double perimeter) {
+        this.perimeter = perimeter;
+    }
 
     public String getBorder() {
         return border;
@@ -50,12 +106,12 @@ public class District {
         this.border = border;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getDistrictId() {
+        return districtId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setDistrictId(Integer districtId) {
+        this.districtId = districtId;
     }
 
     public Set<Precinct> getPrecincts() {
