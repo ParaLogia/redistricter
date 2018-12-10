@@ -1,12 +1,11 @@
 package giants.redistricter.data;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
-
-import org.springframework.stereotype.Repository;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -73,14 +72,14 @@ public class StateLoaderService {
                 content.append(sCurrentLine);
             }
         } catch (IOException e) {
-        	return null;
+            return null;
         } 
         try {
-			State s = om.readValue(content.toString(), State.class);
-			return s;
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
+            State s = om.readValue(content.toString(), State.class);
+            return s;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;		
-	}
+    }
 }

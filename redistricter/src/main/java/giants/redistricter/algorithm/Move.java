@@ -13,6 +13,8 @@ public class Move {
     District destinationDistrict;
 
     public void log(){
+        String out = "{Precinct:" + precinct.getId() + ",from:" + sourceDistrict.getId() + ",to:" + destinationDistrict.getId() + "}";
+        //no access to information regarding objective function.
         return;
     }
 

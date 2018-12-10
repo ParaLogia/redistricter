@@ -6,7 +6,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import giants.redistricter.data.District;
@@ -39,7 +38,5 @@ public class DatabaseService {
     public List<Precinct> getPrecinctsByDistrictsId(Integer precinctId){
         return em.createQuery("SELECT precinct FROM Precinct precinct where precinct.districtId = :value1", Precinct.class).setParameter("value1", precinctId).getResultList();
     }
-	
-	
-	
+		
 }

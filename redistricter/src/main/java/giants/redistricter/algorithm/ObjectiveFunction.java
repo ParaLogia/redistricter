@@ -39,7 +39,8 @@ public class ObjectiveFunction {
                     functions.put(MEAN_MEDIAN,this::calculateMeanMedian); break;
                 case PROPORTIONALITY:
                     functions.put(PROPORTIONALITY,this::calculateProportionality); break;
-                default: //some error here
+                default: //default to polsby_popper in case something is wrong.
+                    functions.put(POLSBY_POPPER,this::calculatePolsbyPopper);
                     break;
             }
         });
@@ -59,7 +60,7 @@ public class ObjectiveFunction {
     }
 
     private double calculatePolsbyPopper(Set<District> districts){
-        double total = 0.;
+        double total = 0.0;
         for (District dist:districts){
             double area = dist.getArea();
             double perimeter = dist.getPerimeter();
@@ -71,25 +72,44 @@ public class ObjectiveFunction {
     }
 
     private double calculateSchwartzberg(Set<District> districts){
+        //modified polsbypopper?
         return 0.0;
     }
     private double calculateReock(Set<District> districts){
+        //the ratio of the area of the district to the area of a minimum bounding circle
         return 0.0;
     }
     private double calculateXSymmetry(Set<District> districts){
+        //dividing the overlapping area, between a district and its reflection across the horizontal axis, by the area of the original district
         return 0.0;
     }
     private double calculateSignificantCorners(Set<District> districts){
+        //count the number of “significant” corners. The more significant corners, the less compact the district by this metric.
+        //we have to define significant corners and normalize it.
         return 0.0;
     }
     private double calculateBoyceClark(Set<District> districts){
+        // the(normalized) mean absolute deviation in the radial lines from the centroid of the district to its vertices
         return 0.0;
     }
     private double calculateLengthWidth(Set<District> districts){
+        //Minimum bounding rectangle
         return 0.0;
     }
     private double calculatePopulationFairness(Set<District> districts){
-        return 0.0;
+        //no access to state so extra code.
+        int populationPerDistrict;
+        int totalPopulation = 0;
+        double total = 0.0;
+        for (District district:districts) {
+            totalPopulation += district.getPopulation();
+        }
+        populationPerDistrict = totalPopulation/districts.size();
+        for (District district:districts){
+            total += Math.abs((populationPerDistrict - district.getPopulation()));
+        }
+        total = total/totalPopulation;
+        return total;
     }
     private double calculateEfficiencyGap(Set<District> districts){
         return 0.0;

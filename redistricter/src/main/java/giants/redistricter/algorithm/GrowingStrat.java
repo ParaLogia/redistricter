@@ -3,24 +3,26 @@ package giants.redistricter.algorithm;
 import giants.redistricter.data.District;
 import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class GrowingStrat extends AlgorithmStrategy {
+    @Autowired
+    RandomService random;
+
     Set<District> districts;
-    Random random;
     District precinctPool;
     double temperature;
     Variation variation;
     double previousObjValue;
     double currentObjValue;
 
-    public GrowingStrat(State state, ObjectiveFunction objFct, Variation variation, Random random){
+    public GrowingStrat(State state, ObjectiveFunction objFct, Variation variation){
         this.state = state;
         this.objFct = objFct;
         this.variation = variation;
-        this.random = random;
         Set<Precinct> precincts = state.getPrecincts();
         precinctPool = new District(-1);
         temperature = 1.0;
@@ -34,7 +36,7 @@ public class GrowingStrat extends AlgorithmStrategy {
         districts = new LinkedHashSet<>();
         for (District origDist : state.getDistricts()) {
             District district = new District(origDist.getDistrictId());
-            Precinct seed = RandomService.select(origDist.getPrecincts(), random);
+            Precinct seed = random.select(origDist.getPrecincts());
             district.addPrecinct(seed);
             precinctPool.removePrecinct(seed);
         }
@@ -61,12 +63,12 @@ public class GrowingStrat extends AlgorithmStrategy {
         Precinct precinctToAdd;
         Move move;
 
-        borderPrecinct = RandomService.select(smallDistrict.getBorderPrecincts(), random);
+        borderPrecinct = random.select(smallDistrict.getBorderPrecincts());
         addablePrecincts = borderPrecinct.getNeighbors().keySet()
                 .stream()
                 .filter(precinctPool.getPrecincts()::contains)
                 .collect(Collectors.toCollection(ArrayList::new));
-        precinctToAdd = RandomService.select(addablePrecincts, random);
+        precinctToAdd = random.select(addablePrecincts);
         move = new Move();
         move.setSourceDistrict(precinctPool);
         move.setDestinationDistrict(smallDistrict);
@@ -82,6 +84,7 @@ public class GrowingStrat extends AlgorithmStrategy {
                 return currentObjValue > previousObjValue;
 
             case PROBABILISTIC_ACCEPT:
+                // TODO actual probability
                 return previousObjValue == 0
                         || currentObjValue / previousObjValue > temperature;
 

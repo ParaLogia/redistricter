@@ -3,14 +3,17 @@ package giants.redistricter.algorithm;
 import giants.redistricter.data.District;
 import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class AnnealingStrat extends AlgorithmStrategy {
 
+    @Autowired
+    RandomService random;
+
     Variation variation;
-    Random random;
     Set<District> districts;
     int iterations = 0;
     final int MAX_ITERATIONS = 5000;
@@ -21,11 +24,10 @@ public class AnnealingStrat extends AlgorithmStrategy {
     double currObjValDelta = Double.MAX_VALUE;
     List<Move> moves;
 
-    public AnnealingStrat(State state, ObjectiveFunction objFct, Variation variation, Random random){
+    public AnnealingStrat(State state, ObjectiveFunction objFct, Variation variation){
         this.state = state;
         this.objFct = objFct;
         this.variation = variation;
-        this.random = random;
         this.districts = state.getDistricts().stream()
                 .map(District::new)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -43,8 +45,8 @@ public class AnnealingStrat extends AlgorithmStrategy {
         District destDistrict = null;
         Move move;
 
-        srcDistrict = RandomService.select(districts, random);
-        precinct = RandomService.select(srcDistrict.getBorderPrecincts(), random);
+        srcDistrict = random.select(districts);
+        precinct = random.select(srcDistrict.getBorderPrecincts());
         // Consider storing a lookup table to map precincts to their districts
         for (District district : districts) {
             if (district.getPrecincts().contains(precinct)) {
@@ -71,6 +73,7 @@ public class AnnealingStrat extends AlgorithmStrategy {
                 return currentObjValue > previousObjValue;
 
             case PROBABILISTIC_ACCEPT:
+                // TODO actual probability
                 return previousObjValue == 0
                         || currentObjValue / previousObjValue > temperature;
 
