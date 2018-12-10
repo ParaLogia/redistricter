@@ -1,0 +1,21 @@
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+             http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+	version="2.1">
+
+	<persistence-unit name="persistence">
+		<description>Hibernate Entity Manager Example</description>
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://mysql4.cs.stonybrook.edu:3306/giants" />
+			<property name="javax.persistence.jdbc.user" value="giants" />
+			<property name="javax.persistence.jdbc.password" value="changeit" />
+			<property name="hibernate.show_sql" value="true" />
+		</properties>
+
+	</persistence-unit>
+
+</persistence>

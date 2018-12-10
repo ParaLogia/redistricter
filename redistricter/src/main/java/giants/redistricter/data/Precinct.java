@@ -2,15 +2,64 @@ package giants.redistricter.data;
 
 import java.util.Map;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+@Entity
+@Table(name = "PRECINCT")
 public class Precinct {
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY, generator = "PRECINCT_ID")
+    @SequenceGenerator(name = "PRECINCT_ID", sequenceName = "PRECINCT_ID")
+    
+    @Column(name = "PRECINCT_ID")
     Integer id;
-    District district;
+    
+    @Column(name = "DISTRICT_ID")
+    Integer districtId;
+    
+    @Column(name = "GEO_DATA")
     String border;
+    
+    @Column(name = "CENTER_POINT")
+    String centerPoint;
+    
+    @Transient
+    District district;
+    @Transient
     Integer population;
+    @Transient
     Map<Precinct,Border> neighbors;
+    @Transient
     Double area;
+    @Transient
     Map<Party, Integer> votes;
+    @Transient
     Map<Demographic,Integer> demographics;
+
+    
+    
+    public Integer getDistrictId() {
+        return districtId;
+    }
+
+    public void setDistrictId(Integer districtId) {
+        this.districtId = districtId;
+    }
+
+    public String getCenterPoint() {
+        return centerPoint;
+    }
+
+    public void setCenterPoint(String centerPoint) {
+        this.centerPoint = centerPoint;
+    }
 
     public String getBorder() {
         return border;

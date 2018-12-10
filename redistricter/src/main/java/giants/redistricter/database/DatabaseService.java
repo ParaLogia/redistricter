@@ -2,126 +2,41 @@ package giants.redistricter.database;
 
 import java.util.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+
 import org.springframework.stereotype.Service;
 
-import gerrymandering.HibernateManager;
-import gerrymandering.model.District;
-import gerrymandering.model.Precinct;
-import gerrymandering.model.State;
+import giants.redistricter.data.District;
+import giants.redistricter.data.Precinct;
+import giants.redistricter.data.State;
 
 
 @Service
 public class DatabaseService {
-    HibernateManager hb;
-
-    //Get State by ID
-    public State getState(int stateId) {
-        List<Object> stateRecords;
-        State toReturn;
-        try {
-            hb = HibernateManager.getInstance();
-            Map<String,Object> criteria = new HashMap<>();
-            criteria.put("stateId", stateId);
-            stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
-            if(stateRecords.isEmpty()) {
-                return null;
-            }
-            toReturn = (State)stateRecords.get(0);
-            return toReturn;
-        }
-        catch(Throwable e) {
-            System.out.println("Exception: ");
-            e.printStackTrace();
-            return null;
-        }
+    
+    private EntityManagerFactory factory = Persistence.createEntityManagerFactory("persistence");
+    private EntityManager em = factory.createEntityManager();
+    
+    public State getStateById(Integer id){
+        return em.find(State.class, id);   
     }
-
-    //Get State by Short Name
-    public State getState(String shortName) {
-        List<Object> stateRecords;
-        State toReturn;
-        try {
-            hb = HibernateManager.getInstance();
-            Map<String,Object> criteria = new HashMap<>();
-            criteria.put("shortName", shortName);
-            stateRecords = hb.getRecordsBasedOnCriteria(State.class, criteria);
-            if(stateRecords.isEmpty()) {
-                return null;
-            }
-            toReturn = (State)stateRecords.get(0);
-            return toReturn;
-        }
-        catch(Throwable e) {
-            System.out.println("Exception: ");
-            e.printStackTrace();
-            return null;
-        }
+    
+    public State getStateByShortName(String shortName) {
+        return em.createQuery("SELECT state FROM State state where state.shortName = :value1", State.class).setParameter("value1", shortName).getSingleResult();
     }
-
-    //Gets all states in DB
-    public Set<State> getAllStates(){
-        List<Object> stateRecords;
-        Set<State> toReturn = new LinkedHashSet<>();
-        try {
-            hb = HibernateManager.getInstance();
-            stateRecords = hb.getAllRecords(State.class);
-            for(Object state : stateRecords) {
-                toReturn.add((State) state);
-            }
-            return toReturn;
-        }
-        catch(Throwable e) {
-            System.out.println("Exception: ");
-            e.printStackTrace();
-            return toReturn;
-        }
+    
+    public List<State> getAllStates(){
+        return em.createQuery("SELECT state FROM State", State.class).getResultList();      
+    } 
+    
+    public List<District> getDistrictsByStateId(Integer stateId){
+        return em.createQuery("SELECT district FROM District district where district.stateId = :value1", District.class).setParameter("value1", stateId).getResultList();
     }
-
-    public Set<District> getAllDistrictsForState(int stateId){
-        List<Object> districtRecords;
-        Set<District> toReturn = new LinkedHashSet<>();
-        try {
-            hb = HibernateManager.getInstance();
-            Map<String,Object> criteria = new HashMap<>();
-            criteria.put("stateId", stateId);
-            districtRecords = hb.getRecordsBasedOnCriteria(District.class, criteria);
-            for(Object district : districtRecords) {
-                toReturn.add((District) district);
-            }
-            return toReturn;
-        }
-        catch(Throwable e) {
-            System.out.println("Exception: ");
-            e.printStackTrace();
-            return toReturn;
-        }
+    
+    public List<Precinct> getPrecinctsByDistrictsId(Integer precinctId){
+        return em.createQuery("SELECT precinct FROM Precinct precinct where precinct.districtId = :value1", Precinct.class).setParameter("value1", precinctId).getResultList();
     }
-
-    public Set<Precinct> getAllPrecinctsForState(int stateId){
-        List<Object> districtList;
-        List<Object> precinctList;
-        District d;
-        Set<Precinct> toReturn = new LinkedHashSet<>();
-        try {
-            hb = HibernateManager.getInstance();
-            Map<String,Object> criteria = new HashMap<>();
-            criteria.put("stateId", stateId);
-            districtList = hb.getRecordsBasedOnCriteria(District.class, criteria);
-            for(Object district : districtList) {
-                d = (District)district;
-                criteria.clear();
-                criteria.put("districtId", d.getDistrictId());
-                precinctList = hb.getRecordsBasedOnCriteria(Precinct.class, criteria);
-                for(Object precinct : precinctList) {
-                    toReturn.add((Precinct)precinct);
-                }
-            }
-            return toReturn;
-        }
-        catch(Throwable e) {
-            System.out.println("Exception: ");
-            e.printStackTrace();
-            return toReturn;
-        }
-    }
+		
 }

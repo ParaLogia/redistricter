@@ -35,7 +35,7 @@ public class GrowingStrat extends AlgorithmStrategy {
     private void initSeeds(){
         districts = new LinkedHashSet<>();
         for (District origDist : state.getDistricts()) {
-            District district = new District(origDist.getId());
+            District district = new District(origDist.getDistrictId());
             Precinct seed = random.select(origDist.getPrecincts());
             district.addPrecinct(seed);
             precinctPool.removePrecinct(seed);

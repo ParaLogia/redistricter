@@ -28,6 +28,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/xmatt/Documents/giants-server/redistricter/src/main/resources/gerrymandering_db_persistence.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
