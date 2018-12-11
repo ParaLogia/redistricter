@@ -16,6 +16,7 @@ public class StateLoaderService {
 		StateLoaderService serv = new StateLoaderService();
 		State state = serv.getStateByShortName("NY");
 		System.out.println(state.getName());
+		System.out.println("Population: " + state.getPopulation());
 	} 
 
     private Map<Integer,State> states;
@@ -25,6 +26,7 @@ public class StateLoaderService {
         State state = checkForStateFile(shortName);
         if(state == null) {
             state = dbService.getStateByShortName(shortName);
+            state.setPopulation(0);
             attachDistrictsToState(state);
         }
         return state;
@@ -34,12 +36,20 @@ public class StateLoaderService {
         List<District> districts = dbService.getDistrictsByStateId(state.getStateId());
         for(District d : districts) {
             attachPrecinctsToDistrict(d);
+            state.setPopulation(d.getPopulation() + state.getPopulation());
         }
         state.setDistricts(new HashSet<District>());
     }
     
     private void attachPrecinctsToDistrict(District d){
-        d.setPrecincts(new HashSet<Precinct>(dbService.getPrecinctsByDistrictsId(d.getDistrictId())));
+        List<Precinct> precincts = dbService.getPrecinctsByDistrictsId(d.getDistrictId());
+        d.setPopulation(0);
+        for(Precinct p : precincts) {
+            if(p.getPopulation() != null) {
+                d.setPopulation(p.getPopulation() + d.getPopulation());
+            }
+        }
+        d.setPrecincts(new HashSet<Precinct>());
     }
 
 //    public State getState(String name) {

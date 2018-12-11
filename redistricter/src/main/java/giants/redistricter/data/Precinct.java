@@ -19,29 +19,29 @@ public class Precinct {
     @SequenceGenerator(name = "PRECINCT_ID", sequenceName = "PRECINCT_ID")
     
     @Column(name = "PRECINCT_ID")
-    Integer id;
+    private Integer id;
     
     @Column(name = "DISTRICT_ID")
-    Integer districtId;
+    private Integer districtId;
     
     @Column(name = "GEO_DATA")
-    String border;
+    private String border;
     
     @Column(name = "CENTER_POINT")
-    String centerPoint;
+    private String centerPoint;
+    @Column(name = "POPULATION")
+    private int population;
     
     @Transient
-    District district;
+    private District district;
     @Transient
-    Integer population;
+    private  Map<Precinct,Border> neighbors;
     @Transient
-    Map<Precinct,Border> neighbors;
+    private Double area;
     @Transient
-    Double area;
+    private Map<Party, Integer> votes;
     @Transient
-    Map<Party, Integer> votes;
-    @Transient
-    Map<Demographic,Integer> demographics;
+    private Map<Demographic,Integer> demographics;
 
     
     
