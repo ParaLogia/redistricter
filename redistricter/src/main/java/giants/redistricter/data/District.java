@@ -1,10 +1,6 @@
 package giants.redistricter.data;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -231,7 +227,71 @@ public class District {
      * @return true if is contiguous, false if it is split into one or more regions
      */
     public Boolean isContiguousWithChange(Precinct precinct){
-        return true;
+        if (!immediateAdjacency(precinct)){
+            return contiguousGraph(precinct);
+        } else {
+            return false;
+        }
     }
+    private Boolean immediateAdjacency(Precinct precinct){
+        //gets a set of adjacent precincts
+        ArrayList<Precinct> adjacents = new ArrayList<>();
+        precinct.getNeighbors().forEach((p,b) -> {
+            if(p.getDistrict().getDistrictId().equals(this.districtId)){
+                adjacents.add(p);
+            }
+        });
 
+        boolean visited[] = new boolean[adjacents.size()];
+        visited = miniPrecinctDFS(adjacents,adjacents.get(0),visited);
+        boolean check = true;
+        for (int i=0; i<visited.length;i++){
+            if(!visited[i]){
+                check = false;
+            }
+        }
+        return check;
+    }
+    private boolean[] miniPrecinctDFS(ArrayList<Precinct> adjacents,Precinct precinct,boolean[] visited){
+        //i hate this
+        if (adjacents.contains(precinct)) {
+            visited[adjacents.indexOf(precinct)] = true;
+            precinct.getNeighbors().forEach((p, b) -> {
+                if (p.getDistrict().getDistrictId().equals(this.districtId)) {
+                    miniPrecinctDFS(adjacents, p, visited);
+                }
+            });
+        }
+        return visited;
+    }
+    private Boolean contiguousGraph(Precinct precinct){
+        //gets a set of adjacent precincts
+        //rip duplicate code
+        //this check is going to be very slow
+        ArrayList<Precinct> borderP = new ArrayList<>();
+        borderP.addAll(borderPrecincts);
+
+        boolean visited[] = new boolean[borderP.size()];
+        visited = bigPrecinctDFS(borderP,borderP.get(0),visited);
+
+        boolean check = true;
+        for (int i=0; i<visited.length;i++){
+            if(!visited[i]){
+                check = false;
+            }
+        }
+        return check;
+    }
+    private boolean[] bigPrecinctDFS(ArrayList<Precinct> borderP,Precinct precinct,boolean[] visited){
+        //i think this works
+        if (borderP.contains(precinct)) {
+            visited[borderP.indexOf(precinct)] = true;
+        }
+        precinct.getNeighbors().forEach((p, b) -> {
+            if (p.getDistrict().getDistrictId().equals(this.districtId)) {
+                miniPrecinctDFS(borderP, p, visited);
+            }
+        });
+        return visited;
+    }
 }
