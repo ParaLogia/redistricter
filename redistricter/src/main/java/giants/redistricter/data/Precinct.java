@@ -17,21 +17,22 @@ public class Precinct {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY, generator = "PRECINCT_ID")
     @SequenceGenerator(name = "PRECINCT_ID", sequenceName = "PRECINCT_ID")
-    
+
     @Column(name = "PRECINCT_ID")
     private Integer id;
-    
+
     @Column(name = "DISTRICT_ID")
     private Integer districtId;
-    
+
     @Column(name = "GEO_DATA")
     private String border;
-    
+
     @Column(name = "CENTER_POINT")
     private String centerPoint;
     @Column(name = "POPULATION")
     private int population;
-    
+    private double perimeter;
+
     @Transient
     private District district;
     @Transient
@@ -43,8 +44,8 @@ public class Precinct {
     @Transient
     private Map<Demographic,Integer> demographics;
 
-    
-    
+
+
     public Integer getDistrictId() {
         return districtId;
     }
@@ -64,11 +65,11 @@ public class Precinct {
     public String getBorder() {
         return border;
     }
-    
+
     public void setBorder(String border) {
         this.border = border;
     }
-    
+
     public Integer getId() {
         return id;
     }
@@ -91,6 +92,14 @@ public class Precinct {
 
     public void setPopulation(Integer population) {
         this.population = population;
+    }
+
+    public double getPerimeter() {
+        return perimeter;
+    }
+
+    public void setPerimeter(double perimeter) {
+        this.perimeter = perimeter;
     }
 
     public Map<Precinct, Border> getNeighbors() {

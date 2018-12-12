@@ -164,14 +164,13 @@ public class District {
         votes.forEach((party, count) -> {
             this.votes.merge(party, count, (total, partial) -> total - partial);
         });
+        perimeter -= precinct.getPerimeter();
         for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
             Precinct neighbor = entry.getKey();
             Border border = entry.getValue();
             if (precincts.contains(neighbor)) {
                 perimeter += border.getLength();
                 borderPrecincts.add(neighbor);
-            } else {
-                perimeter -= border.getLength();
             }
         }
         borderPrecincts.remove(precinct);
@@ -193,6 +192,7 @@ public class District {
         votes.forEach((party, count) -> {
             this.votes.merge(party, count, (total, partial) -> total + partial);
         });
+        perimeter += precinct.getPerimeter();
         for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
             Precinct neighbor = entry.getKey();
             Border border = entry.getValue();
@@ -206,7 +206,6 @@ public class District {
                     borderPrecincts.remove(neighbor);
                 }
             } else {
-                perimeter += border.getLength();
                 borderPrecincts.add(precinct);
             }
         }
