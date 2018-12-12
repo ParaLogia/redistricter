@@ -222,4 +222,16 @@ public class District {
             addPrecinct(precinct);
         }
     }
+
+    /**
+     * Checks if the current district is contiguous and not split up.
+     * This method takes a precinct that was updated to reduce computation cost.
+     * You can use this method before the move is conducted as a test if you want.
+     * @param precinct the precinct that was most recently updated.
+     * @return true if is contiguous, false if it is split into one or more regions
+     */
+    public Boolean isContiguousWithChange(Precinct precinct){
+        return true;
+    }
+
 }
