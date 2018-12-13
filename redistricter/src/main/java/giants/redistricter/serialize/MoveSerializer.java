@@ -21,6 +21,7 @@ public class MoveSerializer extends JsonSerializer<Move> {
         jsonGenerator.writeNumberField("precinct", precinct.getId());
         jsonGenerator.writeNumberField("sourceDistrict", srcDistrict.getDistrictId());
         jsonGenerator.writeNumberField("destinationDistrict", destDistrict.getDistrictId());
+        jsonGenerator.writeNumberField("objectiveDelta", move.getObjectiveDelta());
         jsonGenerator.writeEndObject();
     }
 }

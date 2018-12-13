@@ -66,7 +66,7 @@ public class GrowingStrat extends AlgorithmStrategy {
         Precinct precinctToAdd;
         Move move;
 
-        borderPrecinct = random.select(smallDistrict.getBorderPrecincts());
+        borderPrecinct = random.select(smallDistrict.getInteriorBorderPrecincts());
         addablePrecincts = borderPrecinct.getNeighbors().keySet()
                 .stream()
                 .filter(precinctPool.getPrecincts()::contains)
@@ -102,6 +102,7 @@ public class GrowingStrat extends AlgorithmStrategy {
 
     @Override
     public void acceptMove(Move move) {
+        move.setObjectiveDelta(currentObjValue - previousObjValue);
         previousObjValue = currentObjValue;
         temperature -= COOLING_RATE;
     }
