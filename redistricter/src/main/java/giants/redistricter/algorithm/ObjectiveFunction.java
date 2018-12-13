@@ -147,10 +147,10 @@ public class ObjectiveFunction {
         if (districts.size() == 1){
             return 0.0;
         }
-        int repVotes = 0;
-        int demoVotes = 0;
-        int repWins = 0;
-        int demoWins = 0;
+        double repVotes = 0;
+        double demoVotes = 0;
+        double repWins = 0;
+        double demoWins = 0;
         for (District d: districts){
             Map.Entry<Party,Integer> highestEntry = d.getVotes().entrySet().iterator().next();
             for(Map.Entry<Party,Integer> entry: d.getVotes().entrySet()){
@@ -169,7 +169,7 @@ public class ObjectiveFunction {
                 repWins++;
             }
         }
-        int totalVotes = repVotes + demoVotes;
+        double totalVotes = repVotes + demoVotes;
         double demoWinStat = demoWins/districts.size();
         double demoVotesStat = demoVotes/totalVotes;
         double repWinStat = repWins/districts.size();
