@@ -19,10 +19,12 @@ public class GrowingStrat extends AlgorithmStrategy {
     double previousObjValue;
     double currentObjValue;
 
-    public GrowingStrat(State state, ObjectiveFunction objFct, Variation variation){
+    public GrowingStrat(State state, ObjectiveFunction objFct,
+                        Variation variation, RandomService random){
         this.state = state;
         this.objFct = objFct;
         this.variation = variation;
+        this.random = random;
         Set<Precinct> precincts = state.getPrecincts();
         precinctPool = new District(-1);
         temperature = 1.0;
@@ -39,6 +41,7 @@ public class GrowingStrat extends AlgorithmStrategy {
             Precinct seed = random.select(origDist.getPrecincts());
             district.addPrecinct(seed);
             precinctPool.removePrecinct(seed);
+            districts.add(district);
         }
     }
 
@@ -80,6 +83,9 @@ public class GrowingStrat extends AlgorithmStrategy {
     public boolean isAcceptable() {
         currentObjValue = objFct.calculateObjectiveValue(getDistricts());
         switch (this.variation) {
+            case ANY_ACCEPT:
+                return true;
+
             case GREEDY_ACCEPT:
                 return currentObjValue > previousObjValue;
 

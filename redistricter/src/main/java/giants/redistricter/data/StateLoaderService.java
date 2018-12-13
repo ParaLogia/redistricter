@@ -10,7 +10,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import giants.redistricter.database.DatabaseService;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class StateLoaderService {
 	public static void main(String[] args) {
 		StateLoaderService serv = new StateLoaderService();

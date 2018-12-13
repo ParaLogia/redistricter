@@ -24,6 +24,8 @@ public abstract class AlgorithmStrategy {
             return move;
         }
         boolean accepted = false;
+        int tries = 0;
+        int max_tries = 100;
         while (!accepted) {
             move = generateMove();
             executeMove(move);
@@ -32,6 +34,10 @@ public abstract class AlgorithmStrategy {
                 accepted = true;
             } else {
                 revertMove(move);
+            }
+            tries++;
+            if (tries >= max_tries) {
+                return null;
             }
         }
         return move;
