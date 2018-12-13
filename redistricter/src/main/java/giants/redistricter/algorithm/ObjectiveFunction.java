@@ -125,8 +125,8 @@ public class ObjectiveFunction {
             }
             int totalPopulation = d.getPopulation();
             double tempTotal;
-            totalPopulation = totalPopulation/2;
-            tempTotal = Math.abs(winningPartyVotes - totalPopulation);
+            tempTotal = Math.abs(winningPartyVotes - (totalPopulation/2));
+            tempTotal += totalPopulation - winningPartyVotes;
             tempTotal = tempTotal/totalPopulation;
             total += 1.0 - tempTotal;
         }
