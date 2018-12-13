@@ -1,5 +1,9 @@
 package giants.redistricter.data;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import giants.redistricter.serialize.DistrictSerializer;
+import giants.redistricter.serialize.MoveSerializer;
+
 import java.util.*;
 
 import javax.persistence.Column;
@@ -11,6 +15,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+@JsonSerialize(using = DistrictSerializer.class)
 @Entity
 @Table(name = "DISTRICT")
 public class District {
@@ -43,8 +48,13 @@ public class District {
     Map<Party,Integer> votes;
 
     public District() {
+        this.votes = new LinkedHashMap<>();
+        this.population = 0;
+        this.perimeter = 0.0;
+        this.area = 0.0;
         this.precincts = new LinkedHashSet<>();
         this.borderPrecincts = new LinkedHashSet<>();
+        this.demographics = new LinkedHashMap<>();
     }
 
     public District(Integer id){
@@ -169,7 +179,7 @@ public class District {
             Precinct neighbor = entry.getKey();
             Border border = entry.getValue();
             if (precincts.contains(neighbor)) {
-                perimeter += border.getLength();
+                perimeter += 2*border.getLength();
                 borderPrecincts.add(neighbor);
             }
         }
@@ -197,7 +207,7 @@ public class District {
             Precinct neighbor = entry.getKey();
             Border border = entry.getValue();
             if (this.precincts.contains(neighbor)) {
-                perimeter -= border.getLength();
+                perimeter -= 2*border.getLength();
                 boolean removeBorder = neighbor.getNeighbors()
                         .keySet()
                         .stream()
