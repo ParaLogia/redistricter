@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Http } from '@angular/http';
-
 import { environment } from '../../environments/environment';
 
 import { Admin } from '../models/admin';
@@ -39,33 +38,34 @@ export class LoginComponentComponent implements OnInit {
     // For testing
     console.log(this.adminService.admin);
 
-    if (this.adminService.admin.username === 'admin' && this.adminService.admin.username === 'admin'){
-      this.adminService.isLoggedIn = true;
-      this.router.navigateByUrl('/admin/home');
-    }
-    else{
-      this.showInvalidLoginAlert = true;
-      this.adminService.admin = new Admin();
-    }
+    // if (this.adminService.admin.username === 'admin' && this.adminService.admin.username === 'admin'){
+    //   this.adminService.isLoggedIn = true;
+    //   this.router.navigateByUrl('/admin/home');
+    // }
+    // else{
+    //   this.showInvalidLoginAlert = true;
+    //   this.adminService.admin = new Admin();
+    // }
+  
 
-    // // Post to see if credentials are correct
-    // this.http.post(environment.apiBaseUrl + "/admin/login", this.adminService.admin).toPromise()
-    //   .then( (res) => { // Should return a boolean object whether the login succeeded
-        
-    //     // If valid login
-    //     if (res) {
-    //       this.adminService.isLoggedIn = true;
-    //       this.router.navigateByUrl('/admin/home');
-    //     } else {
-    //       // Show error and clear fields
-    //       this.showInvalidLoginAlert = true;
-    //       this.adminService.admin = new Admin();
-    //     }
-    //   },
-    //   // If an error occurs, log it
-    //   (err) => {
-    //     console.log("error: " + err);
-    //   }) 
+    // Post to see if credentials are correct
+    this.http.post(environment.apiBaseUrl + "/verify_login", this.adminService.admin).toPromise()
+      .then( (res) => { // Should return a boolean object whether the login succeeded
+        console.log(res.text());
+        // If valid login
+        if (res.text() == "true") {
+          this.adminService.isLoggedIn = true;
+          this.router.navigateByUrl('/admin/home');
+        } else {
+          // Show error and clear fields
+          this.showInvalidLoginAlert = true;
+          this.adminService.admin = new Admin();
+        }
+      },
+      // If an error occurs, log it
+      (err) => {
+        console.log("error: " + err);
+      }) 
 
   }
 

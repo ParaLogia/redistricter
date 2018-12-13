@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,12 +24,10 @@ public class UserController {
         return new ResponseEntity<String>(HttpStatus.OK);
     }
     
+    @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/verify_login", method = RequestMethod.POST, consumes = "application/json")
-    public ResponseEntity<String> verifyLogin(@RequestBody User user) {
-        if(userService.verifyUser(user) == false) {
-            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<String>(HttpStatus.OK);
+    public @ResponseBody Boolean verifyLogin(@RequestBody User user) {
+        return userService.verifyUser(user);
     }
     
     @RequestMapping(path = "/preferences", method = RequestMethod.POST, consumes = "application/json")
