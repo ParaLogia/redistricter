@@ -27,6 +27,10 @@ public class DatabaseService {
         return em.createQuery("SELECT state FROM State state where state.shortName = :value1", State.class).setParameter("value1", shortName).getSingleResult();
     }
     
+    public State getStateByFullName(String fullName) {
+        return em.createQuery("SELECT state FROM State state where state.name = :value1", State.class).setParameter("value1", fullName).getSingleResult();
+    }
+    
     public List<State> getAllStates(){
         return em.createQuery("SELECT state FROM State", State.class).getResultList();      
     } 

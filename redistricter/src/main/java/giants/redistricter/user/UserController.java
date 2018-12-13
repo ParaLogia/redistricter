@@ -15,7 +15,7 @@ import giants.redistricter.database.UserService;
 @Controller
 public class UserController {
     @Autowired UserService userService;
-    
+    @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/add_user", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<String> addUser(@RequestBody User user) {
         if(userService.addUser(user) == false) {
@@ -29,12 +29,12 @@ public class UserController {
     public @ResponseBody Boolean verifyLogin(@RequestBody User user) {
         return userService.verifyUser(user);
     }
-    
+    @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/preferences", method = RequestMethod.POST, consumes = "application/json")
     public @ResponseBody UserPreferences getUserPreferences(@RequestBody User user) {
         return userService.getUserPreferences(user);
     }
-    
+    @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/preferences/save", method = RequestMethod.POST, consumes = "application/json")
     public ResponseEntity<String> saveUserPreferences(@RequestBody UserPreferences prefs) {
         if(userService.saveUserPreferences(prefs) == false) {
