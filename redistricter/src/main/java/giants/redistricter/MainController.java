@@ -42,8 +42,9 @@ public class MainController {
 
         String stateName = (String) map.get("state");
         State state;
-        if (stateName.equalsIgnoreCase("MOCK")) {
-            state = mockStateLoader.loadState(stateName);
+        if (stateName.startsWith("MOCK")) {
+            String[] args = stateName.split(" ");
+            state = mockStateLoader.loadState(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         }
         else {
             state = stateLoader.getStateByShortName(stateName);

@@ -28,10 +28,11 @@ public class GrowingStrat extends AlgorithmStrategy {
         Set<Precinct> precincts = state.getPrecincts();
         precinctPool = new District(-1);
         temperature = 1.0;
-        currentObjValue = 0.0;
 
         precinctPool.addPrecincts(precincts);
         initSeeds();
+
+        currentObjValue = objFct.calculateObjectiveValue(districts);
     }
 
     private void initSeeds(){
@@ -60,22 +61,30 @@ public class GrowingStrat extends AlgorithmStrategy {
 
     @Override
     public Move generateMove() {
-        District smallDistrict = getDistrictToGrow();
-        Precinct borderPrecinct;
+//        District districtToGrow = getDistrictToGrow();
+//        Precinct borderPrecinct;
         List<Precinct> addablePrecincts;
         Precinct precinctToAdd;
-        Move move;
+        Move move = new Move();;
 
-        borderPrecinct = random.select(smallDistrict.getInteriorBorderPrecincts());
-        addablePrecincts = borderPrecinct.getNeighbors().keySet()
-                .stream()
-                .filter(precinctPool.getPrecincts()::contains)
-                .collect(Collectors.toCollection(ArrayList::new));
-        precinctToAdd = random.select(addablePrecincts);
-        move = new Move();
-        move.setSourceDistrict(precinctPool);
-        move.setDestinationDistrict(smallDistrict);
-        move.setPrecinct(precinctToAdd);
+        List<District> sortedPopDists = districts.stream()
+                .sorted(Comparator.comparing(District::getPopulation))
+                .collect(Collectors.toList());
+
+        for (District districtToGrow : sortedPopDists) {
+            Set<Precinct> borders = districtToGrow.getBorderPrecincts();
+            addablePrecincts = borders.stream()
+                    .flatMap(p -> p.getNeighbors().keySet().stream())
+                    .filter(p -> precinctPool.getPrecincts().contains(p))
+                    .collect(Collectors.toCollection(ArrayList::new));
+            if (addablePrecincts.size() > 0) {
+                precinctToAdd = random.select(addablePrecincts);
+                move.setSourceDistrict(precinctPool);
+                move.setDestinationDistrict(districtToGrow);
+                move.setPrecinct(precinctToAdd);
+                return move;
+            }
+        }
         return move;
     }
 
@@ -103,6 +112,9 @@ public class GrowingStrat extends AlgorithmStrategy {
     @Override
     public void acceptMove(Move move) {
         move.setObjectiveDelta(currentObjValue - previousObjValue);
+        if (previousObjValue > currentObjValue) {
+            temperature -= COOLING_RATE;
+        }
         previousObjValue = currentObjValue;
         temperature -= COOLING_RATE;
     }

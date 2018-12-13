@@ -33,6 +33,8 @@ public class AnnealingStrat extends AlgorithmStrategy {
         this.districts = state.getDistricts().stream()
                 .map(District::new)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        currentObjValue = objFct.calculateObjectiveValue(districts);
     }
 
     @Override
@@ -49,7 +51,7 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
         // FIXME flawed logic
         srcDistrict = random.select(districts);
-        precinct = random.select(srcDistrict.getInteriorBorderPrecincts());
+        precinct = random.select(srcDistrict.getBorderPrecincts());
         Set<Precinct> neighbors = precinct.getNeighbors().keySet()
                 .stream()
                 .filter(p -> !srcDistrict.getPrecincts().contains(p))
@@ -98,15 +100,15 @@ public class AnnealingStrat extends AlgorithmStrategy {
     public void acceptMove(Move move) {
         currObjValDelta = currentObjValue - previousObjValue;
         move.setObjectiveDelta(currObjValDelta);
-        previousObjValue = currentObjValue;
         if (previousObjValue > currentObjValue) {
             temperature -= COOLING_RATE;
         }
+        previousObjValue = currentObjValue;
+        iterations++;
     }
 
     @Override
     public boolean isComplete() {
-        return iterations > MAX_ITERATIONS
-                || currObjValDelta < CONVERGED_DELTA_VAL;
+        return iterations > MAX_ITERATIONS;
     }
 }
