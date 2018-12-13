@@ -29,18 +29,18 @@ public class MainController {
 
     @Autowired
     RandomService randomService;
-
+    @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/select")
     public State select(@RequestParam String state) {
         return stateLoader.getStateByShortName(state);
     }
-
+    @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/start", method = RequestMethod.POST, consumes = "application/json")
     public Set<District> start(@RequestBody String data) {
         JacksonJsonParser parser = new JacksonJsonParser();
         Map<String, Object> map = parser.parseMap(data);
 
-        String stateName = (String) map.get("state");
+        String stateName = (String) map.get("abbreviation");
         State state;
         if (stateName.startsWith("MOCK")) {
             String[] args = stateName.split(" ");
@@ -62,7 +62,7 @@ public class MainController {
 
         return algorithm.start(state, objFct, alg, variation);
     }
-
+    @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/next")
     public Move next() {
         return algorithm.next();

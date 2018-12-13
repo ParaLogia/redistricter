@@ -4,6 +4,7 @@ import { StateService, DisplayState } from "../state.service";
 import { AdminService } from "../admin.service";
 import { states } from "../models/states";
 import { statesData } from "../models/state-geo";
+import { environment } from '../../environments/environment';
 
 import * as L from "leaflet";
 import { FormGroup } from "@angular/forms";
@@ -109,15 +110,15 @@ export class MapComponentComponent implements OnInit {
   public startAlgorithm() {
     this.algorithmInProgress = true;
     this.lockObjectives = true;
-    // this.http.post(environment.apiBaseUrl + "/main/start", this.stateService.state).toPromise()
-    //   .then( (res) => {
-    //     // Algo return set of districts
-    //     this.initializeDistricts(res);
-    //   },
-    //   // If an error occurs, log it
-    //   (err) => {
-    //     console.log("error: " + err);
-    //   }) 
+    this.http.post(environment.apiBaseUrl + "/start", this.stateService.state).toPromise()
+      .then( (res) => {
+        // Algo return set of districts
+        this.initializeDistricts(res);
+      },
+      // If an error occurs, log it
+      (err) => {
+        console.log("error: " + err);
+      }) 
   }
 
   public pauseAlgorithm() {
@@ -163,6 +164,7 @@ export class MapComponentComponent implements OnInit {
     this.stateService.state.objFunction = 0.96;
     this.stateService.state.senatorsStr = "Maggie Hassan, Jeanne Shaheen";
     this.stateService.state.numPrecincts = this.statesData.features[stateIndex].geometry.coordinates[0].length;
+    this.stateService.state.abbreviation = states.find(st => st.name == this.stateService.state.name).abbreviation
   }
 
   public processCoordinates(index: number): any[] {

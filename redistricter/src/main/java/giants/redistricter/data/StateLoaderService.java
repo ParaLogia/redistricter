@@ -37,6 +37,13 @@ public class StateLoaderService {
         return state;
     }
     
+    public State getStateByFullName(String fullName) {
+            State state = dbService.getStateByFullName(fullName);
+            state.setPopulation(0);
+            attachDistrictsToState(state);
+            return state;
+    }
+    
     private void attachDistrictsToState(State state) {
         List<District> districts = dbService.getDistrictsByStateId(state.getStateId());
         for(District d : districts) {
