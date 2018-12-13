@@ -112,6 +112,11 @@ public class ObjectiveFunction {
         return total;
     }
     private double calculateEfficiencyGap(Set<District> districts){
+        //based on wasted votes.
+        return 0.0;
+    }
+    private double partisanFairness(Set<District> districts){
+        //what the hell does the teacher want.
         return 0.0;
     }
     private double calculateMeanMedian(Set<District> districts){
