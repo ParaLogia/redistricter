@@ -2,6 +2,7 @@ package giants.redistricter;
 
 import giants.redistricter.algorithm.*;
 import giants.redistricter.data.District;
+import giants.redistricter.data.MockStateLoader;
 import giants.redistricter.data.State;
 import giants.redistricter.data.StateLoaderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 
@@ -20,6 +20,9 @@ public class MainController {
 
     @Autowired
     StateLoaderService stateLoader;
+
+    @Autowired
+    MockStateLoader mockStateLoader;
 
     @Autowired
     AlgorithmService algorithm;
@@ -37,7 +40,14 @@ public class MainController {
         JacksonJsonParser parser = new JacksonJsonParser();
         Map<String, Object> map = parser.parseMap(data);
 
-        State state = stateLoader.getStateByShortName((String) map.get("state"));
+        String stateName = (String) map.get("state");
+        State state;
+        if (stateName.equalsIgnoreCase("MOCK")) {
+            state = mockStateLoader.loadState(stateName);
+        }
+        else {
+            state = stateLoader.getStateByShortName(stateName);
+        }
         Map<String, Double> weights = (Map) map.get("weights");
         ObjectiveFunctionBuilder objectiveBuilder = new ObjectiveFunctionBuilder();
         weights.forEach((criteria, weight) -> {

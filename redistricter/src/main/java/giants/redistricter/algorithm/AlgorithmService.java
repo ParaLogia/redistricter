@@ -13,6 +13,9 @@ import java.util.Set;
 @Scope(value="session")
 public class AlgorithmService {
 
+    @Autowired
+    RandomService randomService;
+
     State state;
     AlgorithmStrategy strategy;
     ObjectiveFunction objFct;
@@ -24,10 +27,10 @@ public class AlgorithmService {
 
         switch (alg) {
             case REGION_GROWING:
-                strategy = new GrowingStrat(state, objFct, vari);
+                strategy = new GrowingStrat(state, objFct, vari, randomService);
                 break;
             case SIMULATED_ANNEALING:
-                strategy = new AnnealingStrat(state, objFct, vari);
+                strategy = new AnnealingStrat(state, objFct, vari, randomService);
                 break;
         }
         return strategy.getDistricts();

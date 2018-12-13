@@ -109,7 +109,7 @@ public class ObjectiveFunction {
         for (District district:districts){
             total += Math.abs((populationPerDistrict - district.getPopulation()));
         }
-        total = total/totalPopulation;
+        total = 1.0 - total/totalPopulation;
         return total;
     }
     private double calculateEfficiencyGap(Set<District> districts){

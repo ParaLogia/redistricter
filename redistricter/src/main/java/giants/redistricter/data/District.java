@@ -1,5 +1,9 @@
 package giants.redistricter.data;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import giants.redistricter.serialize.DistrictSerializer;
+import giants.redistricter.serialize.MoveSerializer;
+
 import java.util.*;
 
 import javax.persistence.Column;
@@ -11,6 +15,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+@JsonSerialize(using = DistrictSerializer.class)
 @Entity
 @Table(name = "DISTRICT")
 public class District {
@@ -43,8 +48,13 @@ public class District {
     Map<Party,Integer> votes;
 
     public District() {
+        this.votes = new LinkedHashMap<>();
+        this.population = 0;
+        this.perimeter = 0.0;
+        this.area = 0.0;
         this.precincts = new LinkedHashSet<>();
         this.borderPrecincts = new LinkedHashSet<>();
+        this.demographics = new LinkedHashMap<>();
     }
 
     public District(Integer id){
@@ -164,14 +174,13 @@ public class District {
         votes.forEach((party, count) -> {
             this.votes.merge(party, count, (total, partial) -> total - partial);
         });
+        perimeter -= precinct.getPerimeter();
         for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
             Precinct neighbor = entry.getKey();
             Border border = entry.getValue();
             if (precincts.contains(neighbor)) {
-                perimeter += border.getLength();
+                perimeter += 2*border.getLength();
                 borderPrecincts.add(neighbor);
-            } else {
-                perimeter -= border.getLength();
             }
         }
         borderPrecincts.remove(precinct);
@@ -193,11 +202,12 @@ public class District {
         votes.forEach((party, count) -> {
             this.votes.merge(party, count, (total, partial) -> total + partial);
         });
+        perimeter += precinct.getPerimeter();
         for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
             Precinct neighbor = entry.getKey();
             Border border = entry.getValue();
             if (this.precincts.contains(neighbor)) {
-                perimeter -= border.getLength();
+                perimeter -= 2*border.getLength();
                 boolean removeBorder = neighbor.getNeighbors()
                         .keySet()
                         .stream()
@@ -206,7 +216,6 @@ public class District {
                     borderPrecincts.remove(neighbor);
                 }
             } else {
-                perimeter += border.getLength();
                 borderPrecincts.add(precinct);
             }
         }
