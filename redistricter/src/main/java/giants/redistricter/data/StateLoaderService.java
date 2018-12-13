@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import giants.redistricter.database.DatabaseService;
+import org.springframework.stereotype.Repository;
+
 
 @Service
 public class StateLoaderService {

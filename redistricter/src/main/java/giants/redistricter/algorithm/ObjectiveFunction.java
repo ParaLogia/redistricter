@@ -1,6 +1,7 @@
 package giants.redistricter.algorithm;
 
 import giants.redistricter.data.District;
+import giants.redistricter.data.Party;
 
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -108,10 +109,33 @@ public class ObjectiveFunction {
         for (District district:districts){
             total += Math.abs((populationPerDistrict - district.getPopulation()));
         }
-        total = total/totalPopulation;
+        total = 1.0 - total/totalPopulation;
         return total;
     }
     private double calculateEfficiencyGap(Set<District> districts){
+        //based on wasted votes.
+        //need access to the votes from each district.
+        double total = 0.0;
+        for (District d:districts) {
+            int winningPartyVotes = 0;
+            for (Map.Entry<Party,Integer> entry: d.getVotes().entrySet()){
+                if (winningPartyVotes < entry.getValue()){
+                    winningPartyVotes = entry.getValue();
+                }
+            }
+            int totalPopulation = d.getPopulation();
+            double tempTotal;
+            totalPopulation = totalPopulation/2;
+            tempTotal = Math.abs(winningPartyVotes - totalPopulation);
+            tempTotal = tempTotal/totalPopulation;
+            total += 1.0 - tempTotal;
+        }
+        total = total/districts.size();
+        //higher is better score.
+        return total;
+    }
+    private double partisanFairness(Set<District> districts){
+        //what the hell does the teacher want.
         return 0.0;
     }
     private double calculateMeanMedian(Set<District> districts){

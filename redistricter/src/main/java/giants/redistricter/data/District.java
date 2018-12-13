@@ -1,10 +1,9 @@
 package giants.redistricter.data;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import giants.redistricter.serialize.DistrictSerializer;
+
+import java.util.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +14,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+@JsonSerialize(using = DistrictSerializer.class)
 @Entity
 @Table(name = "DISTRICT")
 public class District {
@@ -47,8 +47,13 @@ public class District {
     Map<Party,Integer> votes;
 
     public District() {
+        this.votes = new LinkedHashMap<>();
+        this.population = 0;
+        this.perimeter = 0.0;
+        this.area = 0.0;
         this.precincts = new LinkedHashSet<>();
         this.borderPrecincts = new LinkedHashSet<>();
+        this.demographics = new LinkedHashMap<>();
     }
 
     public District(Integer id){
@@ -168,14 +173,13 @@ public class District {
         votes.forEach((party, count) -> {
             this.votes.merge(party, count, (total, partial) -> total - partial);
         });
+        perimeter -= precinct.getPerimeter();
         for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
             Precinct neighbor = entry.getKey();
             Border border = entry.getValue();
             if (precincts.contains(neighbor)) {
-                perimeter += border.getLength();
+                perimeter += 2*border.getLength();
                 borderPrecincts.add(neighbor);
-            } else {
-                perimeter -= border.getLength();
             }
         }
         borderPrecincts.remove(precinct);
@@ -197,11 +201,12 @@ public class District {
         votes.forEach((party, count) -> {
             this.votes.merge(party, count, (total, partial) -> total + partial);
         });
+        perimeter += precinct.getPerimeter();
         for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
             Precinct neighbor = entry.getKey();
             Border border = entry.getValue();
             if (this.precincts.contains(neighbor)) {
-                perimeter -= border.getLength();
+                perimeter -= 2*border.getLength();
                 boolean removeBorder = neighbor.getNeighbors()
                         .keySet()
                         .stream()
@@ -210,7 +215,6 @@ public class District {
                     borderPrecincts.remove(neighbor);
                 }
             } else {
-                perimeter += border.getLength();
                 borderPrecincts.add(precinct);
             }
         }
@@ -221,5 +225,81 @@ public class District {
         for (Precinct precinct : precincts) {
             addPrecinct(precinct);
         }
+    }
+
+    /**
+     * Checks if the current district is contiguous and not split up.
+     * This method takes a precinct that was updated to reduce computation cost.
+     * You can use this method before the move is conducted as a test if you want.
+     * @param precinct the precinct that was most recently updated.
+     * @return true if is contiguous, false if it is split into one or more regions
+     */
+    public Boolean isContiguousWithChange(Precinct precinct){
+        if (!immediateAdjacency(precinct)){
+            return contiguousGraph(precinct);
+        } else {
+            return false;
+        }
+    }
+    private Boolean immediateAdjacency(Precinct precinct){
+        //gets a set of adjacent precincts
+        ArrayList<Precinct> adjacents = new ArrayList<>();
+        precinct.getNeighbors().forEach((p,b) -> {
+            if(p.getDistrict().getDistrictId().equals(this.districtId)){
+                adjacents.add(p);
+            }
+        });
+
+        boolean visited[] = new boolean[adjacents.size()];
+        visited = miniPrecinctDFS(adjacents,adjacents.get(0),visited);
+        boolean check = true;
+        for (int i=0; i<visited.length;i++){
+            if(!visited[i]){
+                check = false;
+            }
+        }
+        return check;
+    }
+    private boolean[] miniPrecinctDFS(ArrayList<Precinct> adjacents,Precinct precinct,boolean[] visited){
+        //i hate this
+        if (adjacents.contains(precinct)) {
+            visited[adjacents.indexOf(precinct)] = true;
+            precinct.getNeighbors().forEach((p, b) -> {
+                if (p.getDistrict().getDistrictId().equals(this.districtId)) {
+                    miniPrecinctDFS(adjacents, p, visited);
+                }
+            });
+        }
+        return visited;
+    }
+    private Boolean contiguousGraph(Precinct precinct){
+        //gets a set of adjacent precincts
+        //rip duplicate code
+        //this check is going to be very slow
+        ArrayList<Precinct> borderP = new ArrayList<>();
+        borderP.addAll(borderPrecincts);
+
+        boolean visited[] = new boolean[borderP.size()];
+        visited = bigPrecinctDFS(borderP,borderP.get(0),visited);
+
+        boolean check = true;
+        for (int i=0; i<visited.length;i++){
+            if(!visited[i]){
+                check = false;
+            }
+        }
+        return check;
+    }
+    private boolean[] bigPrecinctDFS(ArrayList<Precinct> borderP,Precinct precinct,boolean[] visited){
+        //i think this works
+        if (borderP.contains(precinct)) {
+            visited[borderP.indexOf(precinct)] = true;
+        }
+        precinct.getNeighbors().forEach((p, b) -> {
+            if (p.getDistrict().getDistrictId().equals(this.districtId)) {
+                miniPrecinctDFS(borderP, p, visited);
+            }
+        });
+        return visited;
     }
 }
