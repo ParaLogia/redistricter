@@ -7,12 +7,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import giants.redistricter.database.DatabaseService;
 import org.springframework.stereotype.Repository;
 
-@Repository
+
+@Service
 public class StateLoaderService {
 	public static void main(String[] args) {
 		StateLoaderService serv = new StateLoaderService();
