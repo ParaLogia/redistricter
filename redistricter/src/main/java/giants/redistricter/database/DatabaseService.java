@@ -16,7 +16,7 @@ import giants.redistricter.data.State;
 @Service
 public class DatabaseService {
     
-    private EntityManagerFactory factory = Persistence.createEntityManagerFactory("persistence");
+    private EntityManagerFactory factory = EntityManagerSingleton.getFactory();
     private EntityManager em = factory.createEntityManager();
     
     public State getStateById(Integer id){

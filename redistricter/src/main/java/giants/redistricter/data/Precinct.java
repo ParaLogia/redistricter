@@ -31,6 +31,7 @@ public class Precinct {
     private String centerPoint;
     @Column(name = "POPULATION")
     private int population;
+    @Transient
     private double perimeter;
 
     @Transient
