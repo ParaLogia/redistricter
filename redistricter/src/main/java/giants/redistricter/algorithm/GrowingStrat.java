@@ -52,17 +52,8 @@ public class GrowingStrat extends AlgorithmStrategy {
         return districts;
     }
 
-    private District getDistrictToGrow(){
-        // TODO get queue of possible moves (in case lowest pop. can't grow)
-        return districts.stream()
-                .min(Comparator.comparing(District::getPopulation))
-                .get();
-    }
-
     @Override
     public Move generateMove() {
-//        District districtToGrow = getDistrictToGrow();
-//        Precinct borderPrecinct;
         List<Precinct> addablePrecincts;
         Precinct precinctToAdd;
         Move move = new Move();;
