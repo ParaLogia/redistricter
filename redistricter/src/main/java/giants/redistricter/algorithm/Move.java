@@ -11,11 +11,20 @@ public class Move {
     Precinct precinct;
     District sourceDistrict;
     District destinationDistrict;
+    double objectiveDelta;
 
     public void log(){
         String out = "{Precinct:" + precinct.getId() + ",from:" + sourceDistrict.getDistrictId() + ",to:" + destinationDistrict.getDistrictId() + "}";
         //no access to information regarding objective function.
         return;
+    }
+
+    public double getObjectiveDelta() {
+        return objectiveDelta;
+    }
+
+    public void setObjectiveDelta(double objectiveDelta) {
+        this.objectiveDelta = objectiveDelta;
     }
 
     public Precinct getPrecinct() {

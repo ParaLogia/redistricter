@@ -49,7 +49,7 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
         // FIXME flawed logic
         srcDistrict = random.select(districts);
-        precinct = random.select(srcDistrict.getBorderPrecincts());
+        precinct = random.select(srcDistrict.getInteriorBorderPrecincts());
         Set<Precinct> neighbors = precinct.getNeighbors().keySet()
                 .stream()
                 .filter(p -> !srcDistrict.getPrecincts().contains(p))
@@ -85,7 +85,7 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
             case PROBABILISTIC_ACCEPT:
                 // TODO actual probability
-                return previousObjValue == 0
+                return previousObjValue == 0.0
                         || currentObjValue / previousObjValue > temperature;
 
             default:
@@ -96,8 +96,12 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
     @Override
     public void acceptMove(Move move) {
+        currObjValDelta = currentObjValue - previousObjValue;
+        move.setObjectiveDelta(currObjValDelta);
         previousObjValue = currentObjValue;
-        temperature -= COOLING_RATE;
+        if (previousObjValue > currentObjValue) {
+            temperature -= COOLING_RATE;
+        }
     }
 
     @Override
