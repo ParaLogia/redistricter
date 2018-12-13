@@ -4,7 +4,7 @@ session = requests.Session()
 
 startdata = \
 {
-    "state": "NY",
+    "state": "MOCK",
     "weights": {
         "POLSBY_POPPER": 0.3,
         "POPULATION_FAIRNESS": 0.7
