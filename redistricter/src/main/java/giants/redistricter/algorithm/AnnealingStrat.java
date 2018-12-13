@@ -24,8 +24,10 @@ public class AnnealingStrat extends AlgorithmStrategy {
     double currObjValDelta = Double.MAX_VALUE;
     List<Move> moves;
 
-    public AnnealingStrat(State state, ObjectiveFunction objFct, Variation variation){
+    public AnnealingStrat(State state, ObjectiveFunction objFct,
+                          Variation variation, RandomService random){
         this.state = state;
+        this.random = random;
         this.objFct = objFct;
         this.variation = variation;
         this.districts = state.getDistricts().stream()
@@ -45,11 +47,17 @@ public class AnnealingStrat extends AlgorithmStrategy {
         District destDistrict = null;
         Move move;
 
+        // FIXME flawed logic
         srcDistrict = random.select(districts);
         precinct = random.select(srcDistrict.getBorderPrecincts());
+        Set<Precinct> neighbors = precinct.getNeighbors().keySet()
+                .stream()
+                .filter(p -> !srcDistrict.getPrecincts().contains(p))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        Precinct neighbor = random.select(neighbors);
         // Consider storing a lookup table to map precincts to their districts
         for (District district : districts) {
-            if (district.getPrecincts().contains(precinct)) {
+            if (district.getPrecincts().contains(neighbor)) {
                 destDistrict = district;
                 break;
             }
@@ -69,6 +77,9 @@ public class AnnealingStrat extends AlgorithmStrategy {
     public boolean isAcceptable() {
         currentObjValue = objFct.calculateObjectiveValue(getDistricts());
         switch (this.variation) {
+            case ANY_ACCEPT:
+                return true;
+
             case GREEDY_ACCEPT:
                 return currentObjValue > previousObjValue;
 
