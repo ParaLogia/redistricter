@@ -6,6 +6,7 @@ import giants.redistricter.data.Party;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import static giants.redistricter.algorithm.ObjectiveCriteria.*;
 
@@ -142,6 +143,41 @@ public class ObjectiveFunction {
         return 0.0;
     }
     private double calculateProportionality(Set<District> districts){
-        return 0.0;
+        //this test should be done on the entire state for accuracy. This should not be run on a single state.
+        if (districts.size() == 1){
+            return 0.0;
+        }
+        int repVotes = 0;
+        int demoVotes = 0;
+        int repWins = 0;
+        int demoWins = 0;
+        for (District d: districts){
+            Map.Entry<Party,Integer> highestEntry = d.getVotes().entrySet().iterator().next();
+            for(Map.Entry<Party,Integer> entry: d.getVotes().entrySet()){
+                if (entry.getValue() > highestEntry.getValue()){
+                    highestEntry = entry;
+                }
+                if (entry.getKey().equals(Party.REPUBLICAN)){
+                    repVotes += entry.getValue();
+                } else if (entry.getKey().equals(Party.DEMOCRAT)){
+                    demoVotes += entry.getValue();
+                }
+            }
+            if (highestEntry.getKey().equals(Party.DEMOCRAT)){
+                demoWins++;
+            } else if (highestEntry.getKey().equals(Party.REPUBLICAN)){
+                repWins++;
+            }
+        }
+        int totalVotes = repVotes + demoVotes;
+        double demoWinStat = demoWins/districts.size();
+        double demoVotesStat = demoVotes/totalVotes;
+        double repWinStat = repWins/districts.size();
+        double repVotesStat = repVotes/totalVotes;
+
+        double out = Math.abs(demoWinStat-demoVotesStat);
+        out += Math.abs(repWinStat-repVotesStat);
+        out = 1-out;
+        return out;
     }
 }
