@@ -13,7 +13,7 @@ import java.util.Set;
 @Repository
 public class MockStateLoader {
     public static void main(String... args) {
-        State state = new MockStateLoader().loadState("Mock");
+        State state = new MockStateLoader().loadState("Mock", 24, 8);
         ObjectiveFunction objective = new ObjectiveFunctionBuilder()
                 .addWeight(ObjectiveCriteria.POLSBY_POPPER, 0.3)
                 .addWeight(ObjectiveCriteria.POPULATION_FAIRNESS, 0.7)
@@ -33,9 +33,7 @@ public class MockStateLoader {
     }
 
     /* Create a mock state with precincts arranged in a square grid */
-    public State loadState(String name) {
-        int width = 64;
-        int numDists = 16;
+    public State loadState(String name, int width, int numDists) {
 
         Set<Precinct> precincts = new LinkedHashSet<>();
         Precinct[][] precArr = new Precinct[width][width];

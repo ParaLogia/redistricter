@@ -2,7 +2,6 @@ package giants.redistricter.data;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import giants.redistricter.serialize.DistrictSerializer;
-import giants.redistricter.serialize.MoveSerializer;
 
 import java.util.*;
 

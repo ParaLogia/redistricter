@@ -25,7 +25,7 @@ public abstract class AlgorithmStrategy {
         }
         boolean accepted = false;
         int tries = 0;
-        int max_tries = 100;
+        int max_tries = 500;
         while (!accepted) {
             move = generateMove();
             executeMove(move);
