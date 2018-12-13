@@ -128,7 +128,7 @@ public class ObjectiveFunction {
             totalPopulation = totalPopulation/2;
             tempTotal = Math.abs(winningPartyVotes - totalPopulation);
             tempTotal = tempTotal/totalPopulation;
-            total += 1 - tempTotal;
+            total += 1.0 - tempTotal;
         }
         total = total/districts.size();
         //higher is better score.
