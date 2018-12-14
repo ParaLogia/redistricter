@@ -66,7 +66,10 @@ public class MainController {
 
         int numDistricts = state.getDistricts().size();
         if (alg == AlgorithmType.REGION_GROWING) {
-            numDistricts = Integer.parseInt(String.valueOf(map.get("districts")));
+            Object districts = map.get("districts");
+            if (districts != null) {
+                numDistricts = Integer.parseInt(String.valueOf(districts));
+            }
         }
 
         return algorithm.start(state, objFct, alg, variation, numDistricts);
