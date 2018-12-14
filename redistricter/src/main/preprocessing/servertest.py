@@ -8,15 +8,16 @@ ndists = 2
 
 startdata = \
 {
-    "abbreviation": f"nh",
+    "abbreviation": "nh",
     "weights": {
-        "POLSBY_POPPER": 0.0,
-        "POPULATION_FAIRNESS": 1.0
+        "POLSBY_POPPER": 0.5,
+        "POPULATION_FAIRNESS": 0.5
     },
     "algorithm": "REGION_GROWING",
-    "districts": 4,
-    "variation": "PROBABILISTIC_ACCEPT",
-    "seed": 123456
+    "districts": 3,
+    "variation": "GREEDY_ACCEPT",
+    "seed": 1234,
+    "year": 2000,
 }
 
 

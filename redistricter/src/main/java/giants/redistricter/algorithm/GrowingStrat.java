@@ -10,14 +10,10 @@ import java.util.stream.Collectors;
 
 public class GrowingStrat extends AlgorithmStrategy {
     @Autowired
-    RandomService random;
+    private RandomService random;
 
-    Set<District> districts;
-    District precinctPool;
-    double temperature;
-    Variation variation;
-    double previousObjValue;
-    double currentObjValue;
+    private Set<District> districts;
+    private District precinctPool;
 
     public GrowingStrat(State state, ObjectiveFunction objFct,
                         Variation variation, RandomService random, int numSeeds){
@@ -81,10 +77,8 @@ public class GrowingStrat extends AlgorithmStrategy {
     }
 
     @Override
-    public Move generateMove() {
-        List<Precinct> addablePrecincts;
-        Precinct precinctToAdd;
-        Move move = new Move();;
+    public Deque<Move> generateMoves() {
+        Deque<Move> moves = new LinkedList<>();
 
         List<District> sortedPopDists = districts.stream()
                 .sorted(Comparator.comparing(District::getPopulation))
@@ -92,50 +86,18 @@ public class GrowingStrat extends AlgorithmStrategy {
 
         for (District districtToGrow : sortedPopDists) {
             Set<Precinct> borders = districtToGrow.getBorderPrecincts();
-            addablePrecincts = borders.stream()
+            borders.stream()
                     .flatMap(p -> p.getNeighbors().keySet().stream())
                     .filter(p -> precinctPool.getPrecincts().contains(p))
-                    .collect(Collectors.toCollection(ArrayList::new));
-            if (addablePrecincts.size() > 0) {
-                precinctToAdd = random.select(addablePrecincts);
-                move.setSourceDistrict(precinctPool);
-                move.setDestinationDistrict(districtToGrow);
-                move.setPrecinct(precinctToAdd);
-                return move;
-            }
+                    .forEach(precinctToAdd -> {
+                        Move move = new Move();
+                        move.setSourceDistrict(precinctPool);
+                        move.setDestinationDistrict(districtToGrow);
+                        move.setPrecinct(precinctToAdd);
+                        moves.add(move);
+                    });
         }
-        return move;
-    }
-
-    @Override
-    public boolean isAcceptable() {
-        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
-        switch (this.variation) {
-            case ANY_ACCEPT:
-                return true;
-
-            case GREEDY_ACCEPT:
-                return currentObjValue > previousObjValue;
-
-            case PROBABILISTIC_ACCEPT:
-                // TODO actual probability
-                return previousObjValue == 0
-                        || currentObjValue / previousObjValue > temperature;
-
-            default:
-                assert false : "Invalid Variation";
-                return false;
-        }
-    }
-
-    @Override
-    public void acceptMove(Move move) {
-        move.setObjectiveDelta(currentObjValue - previousObjValue);
-        if (previousObjValue > currentObjValue) {
-            temperature -= COOLING_RATE;
-        }
-        previousObjValue = currentObjValue;
-        temperature -= COOLING_RATE;
+        return moves;
     }
 
     @Override

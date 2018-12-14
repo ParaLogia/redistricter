@@ -13,15 +13,11 @@ public class AnnealingStrat extends AlgorithmStrategy {
     @Autowired
     RandomService random;
 
-    Variation variation;
     Set<District> districts;
     int iterations = 0;
     final int MAX_ITERATIONS = 5000;
     final double CONVERGED_DELTA_VAL = 0.01;
     double temperature = 1.0;
-    double currentObjValue = 0.0;
-    double previousObjValue = 0.0;
-    double currObjValDelta = Double.MAX_VALUE;
     List<Move> moves;
 
     public AnnealingStrat(State state, ObjectiveFunction objFct,
@@ -43,10 +39,12 @@ public class AnnealingStrat extends AlgorithmStrategy {
     }
 
     @Override
-    public Move generateMove() {
+    public Deque<Move> generateMoves() {
+        // FIXME actual code
         District srcDistrict;
         Precinct precinct;
         District destDistrict = null;
+        Deque<Move> moves = new LinkedList<>();
         Move move;
 
         // FIXME flawed logic
@@ -76,38 +74,12 @@ public class AnnealingStrat extends AlgorithmStrategy {
         move.setSourceDistrict(srcDistrict);
         move.setPrecinct(precinct);
         move.setDestinationDistrict(destDistrict);
-        return move;
-    }
-
-    @Override
-    public boolean isAcceptable() {
-        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
-        switch (this.variation) {
-            case ANY_ACCEPT:
-                return true;
-
-            case GREEDY_ACCEPT:
-                return currentObjValue > previousObjValue;
-
-            case PROBABILISTIC_ACCEPT:
-                // TODO actual probability
-                return previousObjValue == 0.0
-                        || currentObjValue / previousObjValue > temperature;
-
-            default:
-                assert false : "Invalid Variation";
-                return false;
-        }
+        return moves;
     }
 
     @Override
     public void acceptMove(Move move) {
-        currObjValDelta = currentObjValue - previousObjValue;
-        move.setObjectiveDelta(currObjValDelta);
-        if (previousObjValue > currentObjValue) {
-            temperature -= COOLING_RATE;
-        }
-        previousObjValue = currentObjValue;
+        super.acceptMove(move);
         iterations++;
     }
 
