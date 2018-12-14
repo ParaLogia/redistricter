@@ -28,8 +28,6 @@ public class District {
     @Column(name = "STATE_ID")
     Integer stateId;
 
-    @Column(name = "GEO_DATA")
-    String border;
     
     @Transient
     Integer population;
@@ -44,7 +42,7 @@ public class District {
     @Transient
     Map<Demographic,Integer> demographics;
     @Transient
-    Map<Party,Integer> votes;
+    Map<Integer, Map<Party,Integer>> votes;
 
     public District() {
         this.votes = new LinkedHashMap<>();
@@ -71,12 +69,11 @@ public class District {
         this.districtId = other.districtId;
         this.precincts = new LinkedHashSet<>(other.getPrecincts());
         this.borderPrecincts = new LinkedHashSet<>(other.getBorderPrecincts());
-        this.border = other.border;
         this.population = other.population;
         this.area =  other.area;
         this.perimeter = other.perimeter;
         this.demographics = new HashMap<Demographic,Integer>(other.getDemographics());
-        this.votes = new HashMap<Party,Integer>(other.getVotes());
+        this.votes = new LinkedHashMap<>(other.getVotes());
     }
 
     public Integer getStateId() {
@@ -107,13 +104,6 @@ public class District {
         this.perimeter = perimeter;
     }
 
-    public String getBorder() {
-        return border;
-    }
-
-    public void setBorder(String border) {
-        this.border = border;
-    }
 
     public Integer getDistrictId() {
         return districtId;
@@ -151,11 +141,11 @@ public class District {
         this.demographics = demographics;
     }
 
-    public Map<Party, Integer> getVotes() {
+    public Map<Integer, Map<Party, Integer>> getVotes() {
         return votes;
     }
 
-    public void setVotes(Map<Party, Integer> votes) {
+    public void setVotes(Map<Integer, Map<Party, Integer>> votes) {
         this.votes = votes;
     }
 
@@ -163,7 +153,7 @@ public class District {
     public void removePrecinct(Precinct precinct) {
         int population = precinct.getPopulation();
         double area = precinct.getArea();
-        Map<Party, Integer> votes = precinct.getVotes();
+        Map<Integer, Map<Party, Integer>> votes = precinct.getVotes();
         Map<Demographic, Integer> demographics = precinct.getDemographics();
         Map<Precinct, Border> neighbors = precinct.getNeighbors();
         boolean borderPrecinct = false;
@@ -172,8 +162,16 @@ public class District {
         this.population -= population;
         this.area -= area;
 
-        votes.forEach((party, count) -> {
-            this.votes.merge(party, count, (total, partial) -> total - partial);
+//        votes.forEach((party, count) -> {
+//            this.votes.merge(party, count, (total, partial) -> total - partial);
+//        });
+        votes.forEach((yr, pvotes) -> {
+            this.votes.merge(yr, pvotes, (currPVotes, newPVotes) -> {
+                newPVotes.forEach((party, count) -> {
+                    currPVotes.merge(party, count, (total, partial) -> total - partial);
+                });
+                return currPVotes;
+            });
         });
 
         demographics.forEach((demographic, count) -> {
@@ -196,7 +194,7 @@ public class District {
     public void addPrecinct(Precinct precinct){
         int population = precinct.getPopulation();
         double area = precinct.getArea();
-        Map<Party, Integer> votes = precinct.getVotes();
+        Map<Integer, Map<Party, Integer>> votes = precinct.getVotes();
         Map<Demographic, Integer> demographics = precinct.getDemographics();
         Map<Precinct, Border> neighbors = precinct.getNeighbors();
         boolean borderPrecinct = false;
@@ -207,8 +205,13 @@ public class District {
         this.population += population;
         this.area += area;
 
-        votes.forEach((party, count) -> {
-            this.votes.merge(party, count, (total, partial) -> total + partial);
+        votes.forEach((yr, pvotes) -> {
+            this.votes.merge(yr, pvotes, (currPVotes, newPVotes) -> {
+                newPVotes.forEach((party, count) -> {
+                    currPVotes.merge(party, count, (total, partial) -> total + partial);
+                });
+                return currPVotes;
+            });
         });
 
         demographics.forEach((demographic, count) -> {
@@ -252,7 +255,7 @@ public class District {
         if (!immediateAdjacency(precinct)){
             return contiguousGraph(precinct);
         } else {
-            return false;
+            return true;
         }
     }
     private Boolean immediateAdjacency(Precinct precinct){
@@ -276,7 +279,7 @@ public class District {
     }
     private boolean[] miniPrecinctDFS(ArrayList<Precinct> adjacents,Precinct precinct,boolean[] visited){
         //i hate this
-        if (adjacents.contains(precinct)) {
+        if (adjacents.contains(precinct) && visited[adjacents.indexOf(precinct)] == false) {
             visited[adjacents.indexOf(precinct)] = true;
             precinct.getNeighbors().forEach((p, b) -> {
                 if (p.getDistrict().getDistrictId().equals(this.districtId)) {
@@ -291,30 +294,43 @@ public class District {
         //rip duplicate code
         //this check is going to be very slow
         ArrayList<Precinct> borderP = new ArrayList<>();
+        ArrayList<Precinct> adjacents = new ArrayList<>();
+        precinct.getNeighbors().forEach((p,b) -> {
+            if(p.getDistrict().getDistrictId().equals(this.districtId)){
+                adjacents.add(p);
+            }
+        });
         borderP.addAll(borderPrecincts);
 
         boolean visited[] = new boolean[borderP.size()];
-        visited[borderP.indexOf(precinct)]=true;
-        visited = bigPrecinctDFS(borderP,borderP.get(0),visited);
+        boolean visitedAdj[] = new boolean[adjacents.size()];
+        if (borderP.contains(precinct)){
+            visited[borderP.indexOf(precinct)]=true;
+        }
+        visitedAdj = bigPrecinctDFS(borderP,adjacents,adjacents.get(0),visited,visitedAdj);
 
         boolean check = true;
-        for (int i=0; i<visited.length;i++){
-            if(!visited[i]){
+        for (int i=0; i<visitedAdj.length;i++){
+            if(!visitedAdj[i]){
                 check = false;
             }
         }
         return check;
     }
-    private boolean[] bigPrecinctDFS(ArrayList<Precinct> borderP,Precinct precinct,boolean[] visited){
+    private boolean[] bigPrecinctDFS(ArrayList<Precinct> borderP,ArrayList<Precinct> adjacents,Precinct precinct,boolean[] visited,boolean[] visitedAdj){
         //i think this works
-        if (borderP.contains(precinct)) {
+        System.out.println("PRECINCT ID" + precinct.getId());
+        if (borderP.contains(precinct) && visited[borderP.indexOf(precinct)] == false) {
             visited[borderP.indexOf(precinct)] = true;
-        }
-        precinct.getNeighbors().forEach((p, b) -> {
-            if (p.getDistrict().getDistrictId().equals(this.districtId)) {
-                miniPrecinctDFS(borderP, p, visited);
+            if (adjacents.contains(precinct)){
+                visitedAdj[adjacents.indexOf(precinct)] = true;
             }
-        });
-        return visited;
+            precinct.getNeighbors().forEach((p, b) -> {
+                if (p.getDistrict().getDistrictId().equals(this.districtId)) {
+                    bigPrecinctDFS(borderP, adjacents,p, visited,visitedAdj);
+                }
+            });
+        }
+        return visitedAdj;
     }
 }

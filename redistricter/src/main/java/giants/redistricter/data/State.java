@@ -38,7 +38,7 @@ public class State {
     @Transient
     Integer population;
     @Transient
-    Map<Party, Integer> votes;
+    Map<Integer, Map<Party, Integer>> votes;
 
     public String getShortName() {
         return this.shortName;
@@ -97,11 +97,11 @@ public class State {
         this.population = population;
     }
 
-    public Map<Party, Integer> getVotes() {
+    public Map<Integer, Map<Party, Integer>> getVotes() {
         return votes;
     }
 
-    public void setVotes(Map<Party, Integer> votes) {
+    public void setVotes(Map<Integer, Map<Party, Integer>> votes) {
         this.votes = votes;
     }
 }

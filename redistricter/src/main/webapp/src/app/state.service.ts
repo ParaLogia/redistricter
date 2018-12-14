@@ -4,6 +4,7 @@ import { Http } from '@angular/http';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 
+import {states} from './models/states'
 import { environment } from '../environments/environment';
 import { states } from './models/states';
 

@@ -31,10 +31,14 @@ public class MockStateLoader {
                 p.setArea(1.0);
                 p.setPerimeter(4.0);
                 p.setPopulation(2*width+i+j);
+                Map<Integer, Map<Party, Integer>> yearVotes = new LinkedHashMap<>();
                 LinkedHashMap<Party, Integer> votes = new LinkedHashMap<>();
                 votes.put(Party.DEMOCRAT, 2*width-i-j);
                 votes.put(Party.REPUBLICAN, i+j);
-                p.setVotes(votes);
+                for (int yr = 1998; yr < 2018; yr+=2) {
+                    yearVotes.put(yr, votes);
+                }
+                p.setVotes(yearVotes);
                 precArr[i][j] = p;
                 precincts.add(p);
             }
