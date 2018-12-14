@@ -28,8 +28,6 @@ public class District {
     @Column(name = "STATE_ID")
     Integer stateId;
 
-    @Column(name = "GEO_DATA")
-    String border;
     
     @Transient
     Integer population;
@@ -71,7 +69,6 @@ public class District {
         this.districtId = other.districtId;
         this.precincts = new LinkedHashSet<>(other.getPrecincts());
         this.borderPrecincts = new LinkedHashSet<>(other.getBorderPrecincts());
-        this.border = other.border;
         this.population = other.population;
         this.area =  other.area;
         this.perimeter = other.perimeter;
@@ -107,13 +104,6 @@ public class District {
         this.perimeter = perimeter;
     }
 
-    public String getBorder() {
-        return border;
-    }
-
-    public void setBorder(String border) {
-        this.border = border;
-    }
 
     public Integer getDistrictId() {
         return districtId;
