@@ -1,4 +1,10 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpHeaders } from '@angular/common/http';
+
+import { environment } from '../environments/environment';
 
 declare var require: any;
 
@@ -6,19 +12,21 @@ declare var require: any;
   providedIn: 'root'
 })
 export class StateService {
-
   public state: State;
   public selectedPrecinct: Precinct;
 
-  constructor() { 
+  constructor(private http: HttpClient) {
     this.state = new State();
     this.selectedPrecinct = new Precinct();
   }
 
+  public getAllStatesGeo() {
+    return require('../assets/states.json');
+  }
+
   /** Get the district geo json info  */
   public getDistrictGeo(stateName: String) {
-    
-    switch(stateName) {
+    switch (stateName) {
       case 'Colorado': {
         return require('../assets/districts/co_dists_geo.json');
       }
@@ -28,16 +36,15 @@ export class StateService {
       case 'New York': {
         return require('../assets/districts/ny_dists_geo.json');
       }
-      default : {
+      default: {
         return null;
       }
     }
   }
 
-   /** Get the precinct geo json info  */
-   public getPrecinctGeo(stateName: String) {
-    
-    switch(stateName) {
+  /** Get the precinct geo json info  */
+  public getPrecinctGeo(stateName: String) {
+    switch (stateName) {
       case 'Colorado': {
         return require('../assets/precincts/co_geo.json');
       }
@@ -47,25 +54,54 @@ export class StateService {
       case 'New York': {
         return require('../assets/precincts/ny_geo.json');
       }
-      default : {
+      default: {
         return null;
       }
-      
     }
   }
 
-  public populatePrecinct(){
-    console.log("I here");
+  public populatePrecinct() {
+    console.log('I here');
   }
 
-}
+  public setState(name: string): any {
+    this.state.name = name;
+    this.getStateInfo(name);
+    return this.getDistrictGeo(this.state.name);
+  }
 
+  public getStateInfo(name: string) {
+    console.log('called this');
+
+    let httpHeaders = new HttpHeaders();
+    httpHeaders.append('Access-Control-Allow-Origin', '*');
+
+    let httpParams = new HttpParams();
+    httpParams.append('state', 'New York');
+
+    this.http
+      .get('http://localhost:8080/select', {
+        headers: httpHeaders,
+        params: httpParams
+      })
+      .toPromise()
+      .then(
+        (res: Response) => {
+          // Populate state data from backend
+          this.state.population = res['population'] === undefined ? 0 : res['population'] ;
+        },
+        // If an error occurs, log it
+        err => {
+          console.log('error: ' + err);
+        }
+      );
+  }
+}
 
 /**
  * Class associated with state object
  */
 export class State {
-
   public name: string;
 
   public abbreviation: string;
@@ -88,7 +124,6 @@ export class State {
 }
 
 export class Senator {
-
   public name: string;
 
   public party: string;
@@ -98,7 +133,7 @@ export class Senator {
   }
 }
 
-export class DisplayState { 
+export class DisplayState {
   public name: string;
   public abbreviation: string;
 }
@@ -109,4 +144,3 @@ export class Precinct {
   public population: number;
   public districtId: number;
 }
-

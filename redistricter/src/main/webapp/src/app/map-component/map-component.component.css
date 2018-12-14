@@ -1,26 +1,36 @@
-#mapid { 
-    height: 100%; 
-    width: 60%;
-    float:left;
+#mapid {
+  height: 100%;
+  width: 60%;
+  float: left;
 }
 
 ::ng-deep .mat-accent .mat-slider-thumb {
-    background-color: purple;
-} 
+  background-color: purple;
+}
 ::ng-deep .mat-accent .mat-slider-thumb-label {
-    background-color: purple;
-} 
+  background-color: purple;
+}
 ::ng-deep .mat-accent .mat-slider-thumb-label-text {
-    color: white;
-} 
+  color: white;
+}
 ::ng-deep .mat-accent .mat-slider-track-fill {
-    background-color: purple;
-} 
+  background-color: purple;
+}
 
-mat-accent .mat-slider-thumb-label-text
+mat-accent .mat-slider-thumb-label-text .map {
+  height: 100%;
+  padding: 0;
+}
 
-.map {
-    height: 100%;
-    padding: 0;
-  }
-  
+.info {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+.info h4 {
+  margin: 0 0 5px;
+  color: #777;
+}

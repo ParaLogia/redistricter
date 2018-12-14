@@ -6,4 +6,8 @@ html, body {
     margin: 0;
     padding: 0;
   }
+
+  .light-background {
+    background-color: #E6E6FA; 
+  }
   

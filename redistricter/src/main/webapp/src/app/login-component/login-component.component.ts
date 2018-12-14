@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Http } from '@angular/http';
+
 import { environment } from '../../environments/environment';
 
 import { Admin } from '../models/admin';
@@ -42,18 +43,17 @@ export class LoginComponentComponent implements OnInit {
     //   this.adminService.isLoggedIn = true;
     //   this.router.navigateByUrl('/admin/home');
     // }
-    // else{
+    // else {
     //   this.showInvalidLoginAlert = true;
     //   this.adminService.admin = new Admin();
     // }
-  
 
     // Post to see if credentials are correct
     this.http.post(environment.apiBaseUrl + "/verify_login", this.adminService.admin).toPromise()
       .then( (res) => { // Should return a boolean object whether the login succeeded
         console.log(res.text());
         // If valid login
-        if (res.text() == "true") {
+        if (res.text() === "true") {
           this.adminService.isLoggedIn = true;
           this.router.navigateByUrl('/admin/home');
         } else {
