@@ -30,9 +30,11 @@ public abstract class AlgorithmStrategy {
             move = generateMove();
             executeMove(move);
             //contiguity might break it, remove if doesn't work.
-            if (isAcceptable() && move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
-                acceptMove(move);
-                accepted = true;
+            if (isAcceptable()) {
+//                if (move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
+                    acceptMove(move);
+                    accepted = true;
+//                }
             } else {
                 revertMove(move);
             }

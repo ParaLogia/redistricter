@@ -1,10 +1,7 @@
 package giants.redistricter;
 
 import giants.redistricter.algorithm.*;
-import giants.redistricter.data.District;
-import giants.redistricter.data.MockStateLoader;
-import giants.redistricter.data.State;
-import giants.redistricter.data.StateLoaderService;
+import giants.redistricter.data.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.context.annotation.Scope;
@@ -17,6 +14,8 @@ import java.util.Set;
 @RestController
 @Scope(value="session")
 public class MainController {
+    // TODO Remove once we get the database running
+    final boolean JSON_LOAD = true;
 
     @Autowired
     StateLoaderService stateLoader;
@@ -29,11 +28,13 @@ public class MainController {
 
     @Autowired
     RandomService randomService;
+
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/select")
     public State select(@RequestParam String state) {
         return stateLoader.getStateByShortName(state);
     }
+
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/start", method = RequestMethod.POST, consumes = "application/json")
     public Set<District> start(@RequestBody String data) {
@@ -45,6 +46,9 @@ public class MainController {
         if (stateName.startsWith("MOCK")) {
             String[] args = stateName.split(" ");
             state = mockStateLoader.loadMockState(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+        }
+        else if (JSON_LOAD) {
+            state = new JsonStateLoader().getStateByShortName(stateName, 2004);
         }
         else {
             state = stateLoader.getStateByShortName(stateName);
@@ -60,8 +64,14 @@ public class MainController {
         long seed = Long.parseLong(String.valueOf(map.get("seed")));
         randomService.setSeed(seed);
 
-        return algorithm.start(state, objFct, alg, variation);
+        int numDistricts = state.getDistricts().size();
+        if (alg == AlgorithmType.REGION_GROWING) {
+            numDistricts = Integer.parseInt(String.valueOf(map.get("districts")));
+        }
+
+        return algorithm.start(state, objFct, alg, variation, numDistricts);
     }
+
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/next")
     public Move next() {
