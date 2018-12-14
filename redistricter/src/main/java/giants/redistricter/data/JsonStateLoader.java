@@ -15,6 +15,8 @@ public class JsonStateLoader {
     private final String PRECINCTS_FILE = "src/main/resources/data/%s_precincts_final.json";
     private final String NEIGHBORS_FILE = "src/main/resources/data/%s_neighbors.json";
 
+    private Map<String, State> stateCache = new HashMap<>();
+
     public static void main(String... args) {
         State state;
         state = new JsonStateLoader().getStateByShortName("ny");
@@ -128,6 +130,9 @@ public class JsonStateLoader {
     }
 
     public State getStateByShortName(String shortName) {
+        if (stateCache.containsKey(shortName.toLowerCase())) {
+            return stateCache.get(shortName.toLowerCase());
+        }
         String precinctsFile = String.format(PRECINCTS_FILE, shortName.toLowerCase());
         String neighborsFile = String.format(NEIGHBORS_FILE, shortName.toLowerCase());
 
@@ -171,6 +176,8 @@ public class JsonStateLoader {
         state.setVotes(stateVotes);
         state.setPrecincts(precincts);
         state.setDistricts(districts);
+
+        stateCache.put(shortName.toLowerCase(), state);
         return state;
     }
 }
