@@ -8,7 +8,7 @@ ndists = 2
 
 startdata = \
 {
-    "abbreviation": f"nh",
+    "abbreviation": "nh",
     "weights": {
         "POLSBY_POPPER": 0.0,
         "POPULATION_FAIRNESS": 1.0

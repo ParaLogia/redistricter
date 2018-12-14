@@ -4,20 +4,34 @@ import giants.redistricter.data.District;
 import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Set;
+
+import static giants.redistricter.algorithm.Variation.*;
 
 public abstract class AlgorithmStrategy {
     final double COOLING_RATE = 0.05;
     State state;
     ObjectiveFunction objFct;
+    Variation variation;
+    double temperature;
+
+    double currentObjValue = 0.0;
+    double previousObjValue = 0.0;
+    double currObjValDelta = Double.MAX_VALUE;
+
+    Deque<Move> movePool;
+    Move bestMove;
+    double bestDelta = -Double.MAX_VALUE;
+    Deque<Move> moveHistory = new LinkedList<>();
 
     abstract Set<District> getDistricts();
-    abstract Move generateMove();
-    abstract boolean isAcceptable();
+    abstract Deque<Move> generateMoves();
     abstract void acceptMove(Move move);
     abstract boolean isComplete();
 
-    Move nextMove() {
+    public Move nextMove() {
         Move move = null;
 
         if (isComplete()) {
@@ -45,6 +59,16 @@ public abstract class AlgorithmStrategy {
         }
         return move;
     }
+
+    public Move generateMove() {
+        if (movePool == null) {
+            movePool = generateMoves();
+        }
+        if (movePool.isEmpty()) {
+            return bestMove;
+        }
+        return movePool.remove();
+    }
     
     void executeMove(Move move) {
         District srcDistrict = move.getSourceDistrict();
@@ -62,5 +86,26 @@ public abstract class AlgorithmStrategy {
 
         srcDistrict.addPrecinct(precinct);
         destDistrict.removePrecinct(precinct);
+    }
+
+    public boolean isAcceptable() {
+        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
+        switch (this.variation) {
+            case ANY_ACCEPT:
+                return true;
+
+            case GREEDY_ACCEPT:
+                return currentObjValue > previousObjValue
+                        || movePool != null && movePool.isEmpty();
+
+            case PROBABILISTIC_ACCEPT:
+                // TODO actual probability
+                return previousObjValue == 0
+                        || currentObjValue / previousObjValue > temperature;
+
+            default:
+                assert false : "Invalid Variation";
+                return false;
+        }
     }
 }
