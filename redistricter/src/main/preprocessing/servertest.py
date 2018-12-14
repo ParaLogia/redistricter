@@ -7,17 +7,18 @@ session = requests.Session()
 
 startdata = \
 {
-    "abbreviation": "nh",
-    "weights": {
-        "POLSBY_POPPER": 0.5,
-        "POPULATION_FAIRNESS": 0.5
+    'abbreviation': 'co',
+    'weights': {
+        'POLSBY_POPPER': 0.5,
+        'POPULATION_FAIRNESS': 0.5
     },
-    "algorithm": "SIMULATED_ANNEALING",
-    "districts": 2,
-    "variation": "GREEDY_ACCEPT",
-    "seed": 1234,
-    "year": 2000,
+    'algorithm': 'SIMULATED_ANNEALING',
+    'districts': 2,
+    'variation': 'PROBABILISTIC_ACCEPT',
+    'seed': 43543,
+    'year': 2000
 }
+
 
 
 def select(state="NY"):

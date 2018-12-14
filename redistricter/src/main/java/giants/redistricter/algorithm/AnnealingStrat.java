@@ -16,7 +16,10 @@ public class AnnealingStrat extends AlgorithmStrategy {
     Set<District> districts;
     int iterations = 0;
     final int MAX_ITERATIONS = 5000;
+    int losingStreak = 0;
+    final int MAX_LOSING_STREAK = 50;
     final double CONVERGED_DELTA_VAL = 0.01;
+    double past_objective = 0.0;
     double temperature = 1.0;
     List<Move> moves;
 
@@ -96,9 +99,11 @@ public class AnnealingStrat extends AlgorithmStrategy {
                         && bestMove == moveHistory.getLast();
 
             case PROBABILISTIC_ACCEPT:
-                // TODO actual probability
                 return previousObjValue == 0
-                        || currentObjValue / previousObjValue > temperature;
+                        || currObjValDelta > 0
+                        || currentObjValue / previousObjValue < random.nextDouble()*temperature
+                        || movePool.isEmpty()
+                        && bestMove == moveHistory.getLast();
 
             default:
                 assert false : "Invalid Variation";
@@ -109,12 +114,21 @@ public class AnnealingStrat extends AlgorithmStrategy {
     @Override
     public void acceptMove(Move move) {
         super.acceptMove(move);
+        if (currObjValDelta < 0) {
+            losingStreak++;
+        }
+        else {
+            losingStreak = 0;
+        }
         System.err.println(currentObjValue);
         iterations++;
     }
 
     @Override
     public boolean isComplete() {
+        if (losingStreak > MAX_LOSING_STREAK) {
+            return true;
+        }
         return iterations > MAX_ITERATIONS;
     }
 }

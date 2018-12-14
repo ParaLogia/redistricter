@@ -11,7 +11,7 @@ import java.util.Set;
 import static giants.redistricter.algorithm.Variation.*;
 
 public abstract class AlgorithmStrategy {
-    final double COOLING_RATE = 0.05;
+    final double COOLING_RATE = 0.1;
     State state;
     ObjectiveFunction objFct;
     Variation variation;

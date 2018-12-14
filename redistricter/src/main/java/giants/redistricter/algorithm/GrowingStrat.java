@@ -29,6 +29,8 @@ public class GrowingStrat extends AlgorithmStrategy {
 
         precinctPool.addPrecincts(precincts);
         initSeeds(numSeeds);
+        System.err.println("numSeeds: " + numSeeds);
+        System.err.println("dists: " + districts.size());
 
         currentObjValue = objFct.calculateObjectiveValue(districts);
     }
@@ -68,6 +70,9 @@ public class GrowingStrat extends AlgorithmStrategy {
 
                 districts.add(district);
                 numSeeds--;
+                if (numSeeds <= 0) {
+                    break;
+                }
             }
         }
     }
@@ -92,9 +97,11 @@ public class GrowingStrat extends AlgorithmStrategy {
                         && bestMove == moveHistory.getLast();
 
             case PROBABILISTIC_ACCEPT:
-                // TODO actual probability
                 return previousObjValue == 0
-                        || currentObjValue / previousObjValue > temperature;
+                        || currObjValDelta > 0
+                        || currentObjValue / previousObjValue < random.nextDouble()*temperature
+                        || movePool.isEmpty()
+                        && bestMove == moveHistory.getLast();
 
             default:
                 assert false : "Invalid Variation";
