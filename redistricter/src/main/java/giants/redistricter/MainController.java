@@ -32,7 +32,12 @@ public class MainController {
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/select")
     public State select(@RequestParam String state) {
-        return stateLoader.getStateByShortName(state);
+        if (JSON_LOAD) {
+            return new JsonStateLoader().getStateByShortName(state);
+        }
+        else {
+            return stateLoader.getStateByShortName(state);
+        }
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
@@ -56,7 +61,8 @@ public class MainController {
         Map<String, Double> weights = (Map) map.get("weights");
         ObjectiveFunctionBuilder objectiveBuilder = new ObjectiveFunctionBuilder();
         //change the below line if needed.
-        objectiveBuilder.setYear(Integer.parseInt(String.valueOf(map.get("year"))));
+        //objectiveBuilder.setYear(Integer.parseInt(String.valueOf(map.get("year"))));
+        objectiveBuilder.setYear(2016);
         weights.forEach((criteria, weight) -> {
             objectiveBuilder.addWeight(ObjectiveCriteria.valueOf(criteria), weight);
         });
