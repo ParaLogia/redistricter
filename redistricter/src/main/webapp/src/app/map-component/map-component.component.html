@@ -5,7 +5,7 @@
     routerLink="/login"
     style="margin-left: auto;"
   >
-    <button mat-raised-button color="primary">Admin Login</button>
+    <button mat-raised-button color="primary">Login</button>
   </a>
   <a style="margin-left: auto;" *ngIf="adminService.isLoggedIn">
     <button (click)="adminService.logout()" mat-raised-button color="primary">
@@ -18,16 +18,20 @@
   <div>
     <mat-card m-b-20 style="height:8w0px;">
       <div m-r-30>
-
- <mat-form-field m-r-20>
-                <input
-                  matInput
-                  placeholder="Search" name="searchTerm"
-                  [disabled]="this.lockObjectives"
-                  [(ngModel)] = "this.searchTerm"
-                />
-              </mat-form-field>
-
+        <mat-form-field style="width:300px;" m-l-30 m-r-10>
+          <input
+            matInput
+            placeholder="Search"
+            name="searchTerm"
+            [disabled]="this.lockObjectives"
+            [(ngModel)]="this.searchTerm"
+          />
+        </mat-form-field>
+            <button sws-icon--primary rounded (click)="search()">
+              <i class="fas fa-search"></i>
+            </button>
+      </div>
+      <div m-r-30>
         <mat-form-field style="width:300px;" m-l-30>
           <mat-select
             name="stateDDL"
@@ -44,11 +48,6 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
-      </div>
-      <div>
-        <button sws-icon--primary rounded (click)="search()"> 
-          <i class="fas fa-search"></i>
-        </button>
       </div>
       <div *ngIf="enablePrecinctToggle" m-l-30>
         <button
@@ -185,7 +184,9 @@
               max="100"
               tickInterval="1"
               name="populationFairnessSlider"
-              [(ngModel)] = "this.adminService.selectedAlgorithm.populationFairness"
+              [(ngModel)]="
+                this.adminService.selectedAlgorithm.populationFairness
+              "
             ></mat-slider>
 
             <h4>Partisan Fairness</h4>
@@ -200,7 +201,7 @@
               max="100"
               tickInterval="1"
               name="efficencyGapSlider"
-              [(ngModel)] = "this.adminService.selectedAlgorithm.efficencyGap"
+              [(ngModel)]="this.adminService.selectedAlgorithm.efficencyGap"
             ></mat-slider>
 
             <p>Proportionality <i class="fas fa-info-circle"></i></p>
@@ -242,15 +243,22 @@
                 id="algoDDL"
                 [(ngModel)]="this.adminService.selectedAlgorithm.name"
               >
-              <mat-option [value]="'SIMULATED_ANNEALING'"> Simulated Annealing</mat-option>
-              <mat-option [value]="'REGION_GROWING'"> Region Growing</mat-option>
+                <mat-option [value]="'SIMULATED_ANNEALING'">
+                  Simulated Annealing</mat-option
+                >
+                <mat-option [value]="'REGION_GROWING'">
+                  Region Growing</mat-option
+                >
               </mat-select>
             </mat-form-field>
             <span *ngIf="!algorithmInProgress"
               ><button
                 mat-raised-button
                 color="primary"
-                [disabled]="this.adminService.selectedAlgorithm.name === undefined || this.adminService.selectedAlgorithm.variation === undefined"
+                [disabled]="
+                  this.adminService.selectedAlgorithm.name === undefined ||
+                  this.adminService.selectedAlgorithm.variation === undefined
+                "
                 (click)="startAlgorithm()"
               >
                 Start
@@ -260,25 +268,32 @@
               ><button
                 mat-raised-button
                 color="warn"
-                [disabled]="this.adminService.selectedAlgorithm.name === undefined || this.adminService.selectedAlgorithm.variation === undefined"
+                [disabled]="
+                  this.adminService.selectedAlgorithm.name === undefined ||
+                  this.adminService.selectedAlgorithm.variation === undefined
+                "
                 (click)="pauseAlgorithm()"
               >
                 Pause
               </button></span
             >
-              <div>
-                  <mat-form-field m-r-20>
-                      <mat-select
-                        placeholder="Variation"
-                        name="variationDLL"
-                        id="variationDDL"
-                        [(ngModel)]="this.adminService.selectedAlgorithm.variation"
-                      >
-                      <mat-option [value]="'GREEDY_ACCEPT'"> Greedy Accept</mat-option>
-                      <mat-option [value]="'PROBABILISTIC_ACCEPT'"> Probabalistic Accept</mat-option>
-                      </mat-select>
-                    </mat-form-field>
-              </div>
+            <div>
+              <mat-form-field m-r-20>
+                <mat-select
+                  placeholder="Variation"
+                  name="variationDLL"
+                  id="variationDDL"
+                  [(ngModel)]="this.adminService.selectedAlgorithm.variation"
+                >
+                  <mat-option [value]="'GREEDY_ACCEPT'">
+                    Greedy Accept</mat-option
+                  >
+                  <mat-option [value]="'PROBABILISTIC_ACCEPT'">
+                    Probabalistic Accept</mat-option
+                  >
+                </mat-select>
+              </mat-form-field>
+            </div>
             <div>
               <mat-form-field m-r-20>
                 <input

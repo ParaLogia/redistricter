@@ -6,7 +6,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 
 import { environment } from '../environments/environment';
-import { states } from "./models/states";
 
 declare var require: any;
 
@@ -79,12 +78,9 @@ export class StateService {
     let httpHeaders = new HttpHeaders();
     httpHeaders.append('Access-Control-Allow-Origin', '*');
 
-<<<<<<< HEAD
     let httpParams = new HttpParams();
     httpParams.append('state', 'NY');
-=======
-    let stateParam = states.find(st => st.name === name).abbreviation
->>>>>>> f7d6244019f43abcc8ca5ee8366301c7462e68b3
+    let stateParam = states.find(st => st.name === name).abbreviation;
 
     this.http
       .get('http://localhost:8080/select', {
