@@ -36,7 +36,7 @@ public class Precinct {
     @Transient
     private  Map<Precinct,Border> neighbors;
     @Transient
-    private Map<Party, Integer> votes;
+    private Map<Integer,Map<Party, Integer>> votes;
     @Transient
     private Map<Demographic,Integer> demographics;
     public Integer getId() {
@@ -81,10 +81,10 @@ public class Precinct {
     public void setNeighbors(Map<Precinct, Border> neighbors) {
         this.neighbors = neighbors;
     }
-    public Map<Party, Integer> getVotes() {
+    public Map<Integer, Map<Party, Integer>> getVotes() {
         return votes;
     }
-    public void setVotes(Map<Party, Integer> votes) {
+    public void setVotes(Map<Integer, Map<Party, Integer>> votes) {
         this.votes = votes;
     }
     public Map<Demographic, Integer> getDemographics() {
