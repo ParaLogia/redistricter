@@ -65,8 +65,12 @@ export class LoginComponentComponent implements OnInit {
       // If an error occurs, log it
       (err) => {
         console.log("error: " + err);
-      }) 
+      });
 
+  }
+
+  public signUp(): void {
+    this.router.navigateByUrl('/');
   }
 
 }

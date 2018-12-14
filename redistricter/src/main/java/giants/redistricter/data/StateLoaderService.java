@@ -3,10 +3,12 @@ package giants.redistricter.data;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -73,18 +75,19 @@ public class StateLoaderService {
     }
 
     private void attachVotesToPrecinct(Precinct p) {
-        List<Vote> votes = dbService.getVotesByPrecinctId(p.getId());
-        Map<Map<Integer, Party>, Integer> votesMap = new HashMap<Map<Integer, Party>, Integer>();
-        
-        Map<Integer, Party> subMap;
-        Party party;
-        int year;
+        List<Vote> votes = dbService.getVotesByPrecinctId(p.getId()); 
+        Map<Party, Integer> subMap;
+        Map<Integer, Map<Party, Integer>> votesMap = new HashMap<Integer, Map<Party, Integer>>();
         for(Vote v : votes) {
-            subMap = new HashMap<Integer, Party>();
-            party = Party.valueOf(v.getParty());
-            year = v.getYear();
-            subMap.put(v.getYear(), party);
-            votesMap.put(subMap, v.getVotes());
+            if(votesMap.get(v.getYear()) == null) {
+                subMap= new HashMap<Party, Integer>();
+                subMap.put(Party.valueOf(v.getParty()), v.getVotes());
+                votesMap.put(v.getYear(), subMap);
+            }
+            else {
+                votesMap.get(v.getYear()).put(Party.valueOf(v.getParty()), v.getVotes()); 
+            }
+          
         }
         p.setVotes(votesMap); 
     }
