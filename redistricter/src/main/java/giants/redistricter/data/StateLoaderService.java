@@ -3,6 +3,7 @@ package giants.redistricter.data;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -64,11 +65,28 @@ public class StateLoaderService {
         d.setPerimeter(0.0);
         for(Precinct p : precincts) {
             attachDemographicsToPrecinct(p);
+            attachVotesToPrecinct(p);
             d.setPopulation(p.getPopulation() + d.getPopulation());
             d.setArea(d.getArea()+p.getArea());
             d.setPerimeter(d.getPerimeter()+p.getPerimeter());
         }
         d.setPrecincts(new HashSet<Precinct>(precincts));
+    }
+
+    private void attachVotesToPrecinct(Precinct p) {
+        List<Vote> votes = dbService.getVotesByPrecinctId(p.getId());
+        Map<Party,Integer> subMap;
+        Map<Integer,Map<Party,Integer>> votesMap = new HashMap<>();
+        for(Vote v : votes) {
+            if (votesMap.get(v.getYear())==null){
+                subMap = new HashMap<>();
+                subMap.put(Party.valueOf(v.getParty()),v.getVotes());
+                votesMap.put(v.getYear(),subMap);
+            } else {
+                votesMap.get(v.getYear()).put(Party.valueOf(v.getParty()),v.getVotes());
+            }
+        }
+        p.setVotes(votesMap); 
     }
 
     private void attachDemographicsToPrecinct(Precinct p) {

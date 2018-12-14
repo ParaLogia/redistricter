@@ -26,8 +26,17 @@ public class UserController {
     
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/verify_login", method = RequestMethod.POST, consumes = "application/json")
-    public @ResponseBody Boolean verifyLogin(@RequestBody User user) {
-        return userService.verifyUser(user);
+    public @ResponseBody UserResponse verifyLogin(@RequestBody User user) {
+        UserResponse resp = new UserResponse();
+        User ver = userService.verifyUser(user);
+        if(ver == null) {
+            resp.setIsAdmin(false);
+            resp.setIsValid(false);
+            return resp;
+        }
+        resp.setIsValid(true);
+        resp.setIsAdmin(ver.isAdmin());
+        return resp;
     }
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/preferences", method = RequestMethod.POST, consumes = "application/json")
