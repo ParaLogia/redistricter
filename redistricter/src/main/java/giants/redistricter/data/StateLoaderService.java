@@ -46,22 +46,27 @@ public class StateLoaderService {
     
     private void attachDistrictsToState(State state) {
         List<District> districts = dbService.getDistrictsByStateId(state.getStateId());
+        state.setPrecincts(new HashSet<Precinct>());
         for(District d : districts) {
             attachPrecinctsToDistrict(d);
+            state.getPrecincts().addAll(d.getPrecincts());
             state.setPopulation(d.getPopulation() + state.getPopulation());
         }
+        
         state.setDistricts(new HashSet<District>(districts));
     }
     
     private void attachPrecinctsToDistrict(District d){
         List<Precinct> precincts = dbService.getPrecinctsByDistrictsId(d.getDistrictId());
         d.setPopulation(0);
+        d.setArea(0.0);
+        d.setPerimeter(0.0);
         for(Precinct p : precincts) {
-            if(p.getPopulation() != null) {
-                d.setPopulation(p.getPopulation() + d.getPopulation());
-            }
+            d.setPopulation(p.getPopulation() + d.getPopulation());
+            d.setArea(d.getArea()+p.getArea());
+            d.setPerimeter(d.getPerimeter()+p.getPerimeter());
         }
-        d.setPrecincts(new HashSet<Precinct>());
+        d.setPrecincts(new HashSet<Precinct>(precincts));
     }
 
 //    public State getState(String name) {

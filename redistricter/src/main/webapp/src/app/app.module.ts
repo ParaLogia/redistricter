@@ -21,6 +21,7 @@ import { AppComponent } from './app.component';
 import { MapComponentComponent } from './map-component/map-component.component';
 import { LoginComponentComponent } from './login-component/login-component.component';
 import { AdminHomeComponent } from './admin-home/admin-home.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 const appRoutes: Routes = [
@@ -52,12 +53,10 @@ const appRoutes: Routes = [
     MatInputModule,
     MatSlideToggleModule,
     MatTableModule,
-    HttpModule
+    HttpModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule {
-
-  
- }
+export class AppModule { }

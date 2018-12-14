@@ -35,45 +35,41 @@
           </mat-select>
         </mat-form-field>
       </div>
+      <div>
+        <button sws-icon--primary rounded (click)="search()"> 
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
       <div *ngIf="enablePrecinctToggle" m-l-30>
-          <button m-l-30
+        <button
+          m-l-30
           mat-raised-button
           color="primary"
           (click)="toggleDisplayPrecincts()"
-        >Show Precincts </button>
-      
+        >
+          Show Precincts
+        </button>
       </div>
     </mat-card>
   </div>
 
   <div>
-    <mat-card>
+    <mat-card style="width:100%">
       <mat-tab-group>
-        <mat-tab label="Information">
-          <div m-l-30>
-            <h3><b>State: </b>{{ stateService.state.name }}</h3>
-            <p><b>Population: </b> {{ stateService.state.population }}</p>
-            <p><b>Votes: </b> {{ stateService.state.votes }}</p>
-            <p>
-              <b>Number of Precincts: </b> {{ stateService.state.numPrecincts }}
-            </p>
-            <p>
-              <b>Objective Performance: </b>
-              {{ stateService.state.objFunction }}
-            </p>
-            <p><b>Current Senators: </b>{{ stateService.state.senatorsStr }}</p>
-            <!-- <p><b>Current Representatives:</b></p> -->
-          </div>
+        <mat-tab label="Information" class="light-background">
           <div>
             <table
               class="mdl-data-table mdl-js-data-table mdl-data-table mdl-shadow--2dp"
-              m-l-30
-              *ngIf="showPrecinctTable"
+              m-h-30
+              m-v-20
+              style="width: 88%;"
             >
               <thead>
                 <tr>
                   <th class="mdl-data-table__cell--non-numeric">
-                    <h4 style="color:black">Precinct Information</h4>
+                    <h4 style="color:black">
+                      State Information {{ stateService.state.name }}
+                    </h4>
                   </th>
                 </tr>
               </thead>
@@ -83,32 +79,80 @@
                     class="mdl-data-table__cell--non-numeric"
                     style="width:250px;"
                   >
-                    <b>ID Number: </b>
-                  </td>
-                  <td style="width:300px;">
-                    {{ this.stateService.selectedPrecinct.id }}
-                  </td>
-                </tr>
-                <tr>
-                  <td class="mdl-data-table__cell--non-numeric">
                     <b>Population: </b>
                   </td>
-                  <td>{{ this.stateService.selectedPrecinct.population }}</td>
+                  <td style="width:300px;">
+                    {{ stateService.state.population }}
+                  </td>
                 </tr>
                 <tr>
                   <td class="mdl-data-table__cell--non-numeric">
-                    <b>Party: </b>
+                    <b>Votes: </b>
                   </td>
-                  <td>{{ this.stateService.selectedPrecinct.party }}</td>
+                  <td>{{ stateService.state.votes }}</td>
                 </tr>
                 <tr>
                   <td class="mdl-data-table__cell--non-numeric">
-                    <b>District ID: </b>
+                    <b>Number of Precincts: </b>
                   </td>
-                  <td>{{ this.stateService.selectedPrecinct.districtId }}</td>
+                  <td>{{ stateService.state.numPrecincts }}</td>
+                </tr>
+                <tr>
+                  <td class="mdl-data-table__cell--non-numeric">
+                    <b>Objective Preformance: </b>
+                  </td>
+                  <td>{{ stateService.state.objFunction }}</td>
+                </tr>
+                <tr>
+                  <td class="mdl-data-table__cell--non-numeric">
+                    <b>Current Senators: </b>
+                  </td>
+                  <td>{{ stateService.state.senatorsStr }}</td>
                 </tr>
               </tbody>
             </table>
+            <div>
+              <table
+                style="width: 88%;"
+                class="mdl-data-table mdl-js-data-table mdl-data-table mdl-shadow--2dp"
+                m-h-30
+                *ngIf="showPrecinctTable"
+              >
+                <thead>
+                  <tr>
+                    <th class="mdl-data-table__cell--non-numeric">
+                      <h4 style="color:black">Precinct Information</h4>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="mdl-data-table__cell--non-numeric">
+                      <b>ID Number: </b>
+                    </td>
+                    <td>{{ this.stateService.selectedPrecinct.id }}</td>
+                  </tr>
+                  <tr>
+                    <td class="mdl-data-table__cell--non-numeric">
+                      <b>Population: </b>
+                    </td>
+                    <td>{{ this.stateService.selectedPrecinct.population }}</td>
+                  </tr>
+                  <tr>
+                    <td class="mdl-data-table__cell--non-numeric">
+                      <b>Party: </b>
+                    </td>
+                    <td>{{ this.stateService.selectedPrecinct.party }}</td>
+                  </tr>
+                  <tr>
+                    <td class="mdl-data-table__cell--non-numeric">
+                      <b>District ID: </b>
+                    </td>
+                    <td>{{ this.stateService.selectedPrecinct.districtId }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </mat-tab>
         <mat-tab label="Objectives">

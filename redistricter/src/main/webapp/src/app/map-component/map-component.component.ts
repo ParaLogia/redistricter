@@ -4,9 +4,12 @@ import { StateService, DisplayState } from "../state.service";
 import { AdminService } from "../admin.service";
 import { states } from "../models/states";
 import { statesData } from "../models/state-geo";
-import { environment } from '../../environments/environment';
 
 import * as L from "leaflet";
+import { environment } from '../../environments/environment';
+
+// @ts-ignore
+import _ from "leaflet-search";
 import { FormGroup } from "@angular/forms";
 import { latLng, tileLayer } from "leaflet";
 import { Http } from "@angular/http";
@@ -67,10 +70,11 @@ export class MapComponentComponent implements OnInit {
     this.statesDDL = states;
 
     // Initialize map
-    this.mymap = L.map("mapid").setView([37.8, -96], 4);
+    var mapvar = (this.mymap = L.map("mapid").setView([37.8, -96], 4));
+    var stateService = this.stateService;
+
     L.tileLayer(
       "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
-
       {
         attribution:
           'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery � <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -81,24 +85,93 @@ export class MapComponentComponent implements OnInit {
       }
     ).addTo(this.mymap);
 
-    this.geojson = L.geoJSON(this.statesData, {
-      // onEachFeature: function(feature, layer) {
-      //   console.log("Hello");
-      //   layer.on({
-      //     mouseover: function(){
-      //       console.log("hi");
-      //     }
-      //   })
-      //       },
+    // var info = L.control();
+
+    // info.onAdd = function(map) {
+    //   this._div = L.DomUtil.create("div", "info"); // create a div with a class "info"
+    //   this.update();
+    //   return this._div;
+    // };
+
+    // // method that we will use to update the control based on feature properties passed
+    // info.update = function(props) {
+    //   this._div.innerHTML =
+    //     "<h4>US Population Density</h4>" +
+    //     (props
+    //       ? "<b>" +
+    //         props.name +
+    //         "</b><br />" +
+    //         props.density +
+    //         " people / mi<sup>2</sup>"
+    //       : "Hover over a state");
+    // };
+
+    // info.addTo(this.mymap);
+
+
+    // let hey = L.Control.Search;
+    // console.log(hey);
+
+    // mapvar.addControl( new L.Control.Search({
+    //   url: 'http://nominatim.openstreetmap.org/search?format=json&q={s}',
+    //   jsonpParam: 'json_callback',
+    //   propertyName: 'display_name',
+    //   propertyLoc: ['lat', 'lon'],
+    //   marker: L.circleMarker([0, 0],{radius:30}),
+    //   autoCollapse: true,
+    //   autoType: false,
+    //   minLength: 2
+    // }) );
+
+    this.geojson = L.geoJSON(this.stateService.getAllStatesGeo(), {
       style: {
         weight: 2,
         fillColor: "#E6E6FA",
         color: "#673AB7",
         fillOpacity: 0.7
+      },
+      onEachFeature: function(feature, layer) {
+        // When a state is clicked
+        layer.on("click", function() {
+          // Process the coordss and add them to map
+          let newCoords = processCoord(feature.geometry.coordinates);
+          let polyline = L.polyline(newCoords, {
+            color: "#E6E6FA"
+          }).addTo(mapvar);
+          mapvar.fitBounds(polyline.getBounds());
+
+          // Set districts if applicable
+          let json = stateService.setState(feature.properties.name);
+          console.log(json);
+          if (json !== null) {
+            L.geoJSON(json, {
+              style: {
+                weight: 2,
+                color: "#512DA8",
+                fillColor: "#E6E6FA",
+                fillOpacity: 0.9
+              }
+            }).addTo(mapvar);
+          }
+        });
+
+        function hello() {
+          console.log("hello");
+        }
+
+        function processCoord(coords) {
+          let coords1 = [];
+          for (var i = 0; i < coords[0].length; i++) {
+            coords1.push([coords[0][i][1], coords[0][i][0]]);
+          }
+
+          return coords1;
+        }
       }
     }).addTo(this.mymap);
   }
 
+  /** Converts the number to percent format */
   public percentFormat(value: number | null) {
     if (!value) {
       return "0%";
@@ -118,7 +191,7 @@ export class MapComponentComponent implements OnInit {
       // If an error occurs, log it
       (err) => {
         console.log("error: " + err);
-      }) 
+      });
   }
 
   public pauseAlgorithm() {
@@ -126,14 +199,14 @@ export class MapComponentComponent implements OnInit {
     this.lockObjectives = false;
   }
 
-  public generateRandomSeed() {}
-  
+  public generateRandomSeed() {
+    console.log("I HERE");
+  }
+
   public initializeDistricts(districtData: any) {}
 
   public changeStateGeo(e) {
     this.enablePrecinctToggle = true;
-
-    console.log(e);
     let stateIndex = 0;
     for (let i = 0; i < this.statesDDL.length; i++) {
       if (this.statesDDL[i].name === this.stateService.state.name) {
@@ -143,10 +216,11 @@ export class MapComponentComponent implements OnInit {
 
     // Process coordinates and zoom in on selected state
     let coords = this.processCoordinates(stateIndex);
+    console.log(coords);
     let polyline = L.polyline(coords, { color: "#E6E6FA" }).addTo(this.mymap);
     this.mymap.fitBounds(polyline.getBounds());
 
-    let json = this.stateService.getDistrictGeo(this.stateService.state.name);
+    let json = this.stateService.setState(this.stateService.state.name);
     if (json !== null) {
       L.geoJSON(json, {
         style: {
@@ -157,14 +231,12 @@ export class MapComponentComponent implements OnInit {
         }
       }).addTo(this.mymap);
     }
-    ///
 
-    this.stateService.state.population = 1342795;
-    this.stateService.state.votes = 253062;
-    this.stateService.state.objFunction = 0.96;
-    this.stateService.state.senatorsStr = "Maggie Hassan, Jeanne Shaheen";
-    this.stateService.state.numPrecincts = this.statesData.features[stateIndex].geometry.coordinates[0].length;
-    this.stateService.state.abbreviation = states.find(st => st.name == this.stateService.state.name).abbreviation
+    this.stateService.state.numPrecincts = this.statesData.features[
+      stateIndex
+    ].geometry.coordinates[0].length;
+    
+    this.stateService.state.abbreviation = states.find(st => st.name === this.stateService.state.name).abbreviation;
   }
 
   public processCoordinates(index: number): any[] {
@@ -191,9 +263,7 @@ export class MapComponentComponent implements OnInit {
       console.log(json);
       let layer = L.geoJSON(json, {
         onEachFeature: function(feature, layer) {
-          layer.on({
-            mouseover: function() {}
-          });
+          layer.on("click", function() {});
         },
         style: {
           weight: 1,
@@ -205,56 +275,34 @@ export class MapComponentComponent implements OnInit {
       // layer.bringToBack();
     }
 
-  //   var start = new Date().getTime();
-  //   var end = start;
-  //   while(end < start + 3000) {
-  //     end = new Date().getTime();
-  //  }
+    //   var start = new Date().getTime();
+    //   var end = start;
+    //   while(end < start + 3000) {
+    //     end = new Date().getTime();
+    //  }
     this.stateService.selectedPrecinct.id = 137;
     this.stateService.selectedPrecinct.districtId = 1;
-    this.stateService.selectedPrecinct.party = 'Democrat';
-    this.stateService.selectedPrecinct.population= 101,947;
+    this.stateService.selectedPrecinct.party = "Democrat";
 
     this.enablePrecinctToggle = false;
   }
+
+public search(): void {
+  console.log("yes");
+  let url = 'http://nominatim.openstreetmap.org/search?format=json&q=' + 'Brooklyn';
+  this.http
+      .get(url)
+      .toPromise()
+      .then(
+        (res) => {
+          // Populate state data from backend
+         console.log( JSON.parse(res['_body'])[0]['lat'] );
+        },
+        // If an error occurs, log it
+        err => {
+          console.log('error: ' + err);
+        }
+      );
+}
   
-  
-
-  public onEachFeature(feature, layer) {
-    console.log("Hello");
-    // does this feature have a property named popupContent?
-    if (feature.properties && feature.properties.popupContent) {
-      layer.bindPopup(feature.properties.popupContent);
-    }
-  }
-
-  //   public highlightFeature(e) {
-  //     var layer = e.target;
-
-  //     layer.setStyle({
-  //       weight: 5,
-  //       color: '#666',
-  //       dashArray: '',
-  //       fillOpacity: 0.7
-  //   });
-
-  //       layer.bringToFront();
-
-  //   }
-
-  //   public resetHighlight(e) {
-  //     this.geojson.resetStyle(e.target);
-  // }
-
-  // public zoomToFeature(e) {
-  //   this.mymap.fitBounds(e.target.getBounds());
-  // }
-
-  // public onEachFeature(feature, layer) {
-  //   layer.on({
-  //       mouseover: this.highlightFeature,
-  //       mouseout: this.resetHighlight,
-  //       click: this.zoomToFeature
-  //   });
-  // }
 }
