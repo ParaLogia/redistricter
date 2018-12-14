@@ -5,6 +5,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 
 import { environment } from '../environments/environment';
+import { states } from './models/states';
 
 declare var require: any;
 
@@ -14,6 +15,7 @@ declare var require: any;
 export class StateService {
   public state: State;
   public selectedPrecinct: Precinct;
+  public precinctJson: any;
 
   constructor(private http: HttpClient) {
     this.state = new State();
@@ -46,7 +48,7 @@ export class StateService {
   public getPrecinctGeo(stateName: String) {
     switch (stateName) {
       case 'Colorado': {
-        return require('../assets/precincts/co_geo.json');
+        return require('../assets/precincts/co_precincts.json');
       }
       case 'New Hampshire': {
         return require('../assets/precincts/nh_geo.json');
@@ -77,14 +79,9 @@ export class StateService {
     let httpHeaders = new HttpHeaders();
     httpHeaders.append('Access-Control-Allow-Origin', '*');
 
-<<<<<<< HEAD
     let httpParams = new HttpParams();
     httpParams.append('state', 'NY');
     let stateParam = states.find(st => st.name === name).abbreviation;
-=======
-
-    let stateParam = states.find(st => st.name === name).abbreviation
->>>>>>> bc8ce95ee2ec377f80732dbaeb3d062481eaf234
 
     this.http
       .get('http://localhost:8080/select', {
@@ -150,4 +147,6 @@ export class Precinct {
   public party: string;
   public population: number;
   public districtId: number;
+  public republicanVotes: number; 
+  public democratVotes: number;
 }
