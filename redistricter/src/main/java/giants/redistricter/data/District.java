@@ -28,8 +28,6 @@ public class District {
     @Column(name = "STATE_ID")
     Integer stateId;
 
-    @Column(name = "GEO_DATA")
-    String border;
     
     @Transient
     Integer population;
