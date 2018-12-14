@@ -4,20 +4,34 @@ import giants.redistricter.data.District;
 import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
 
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Set;
 
+import static giants.redistricter.algorithm.Variation.*;
+
 public abstract class AlgorithmStrategy {
-    final double COOLING_RATE = 0.05;
+    final double COOLING_RATE = 0.1;
     State state;
     ObjectiveFunction objFct;
+    Variation variation;
+    double temperature;
+
+    double currentObjValue = 0.0;
+    double previousObjValue = 0.0;
+    double currObjValDelta = Double.MAX_VALUE;
+
+    Deque<Move> movePool;
+    Move bestMove;
+    double bestDelta = -Double.MAX_VALUE;
+    Deque<Move> moveHistory = new LinkedList<>();
 
     abstract Set<District> getDistricts();
-    abstract Move generateMove();
-    abstract boolean isAcceptable();
-    abstract void acceptMove(Move move);
+    abstract Deque<Move> generateMoves();
     abstract boolean isComplete();
+    abstract boolean isAcceptable(Move move);
 
-    Move nextMove() {
+    public Move nextMove() {
         Move move = null;
 
         if (isComplete()) {
@@ -29,13 +43,10 @@ public abstract class AlgorithmStrategy {
         while (!accepted) {
             move = generateMove();
             executeMove(move);
-            //contiguity might break it, remove if doesn't work.
-            if (isAcceptable()) {
-                if (move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
+            if (isAcceptable(move)) {
                     acceptMove(move);
                     accepted = true;
-                }
-            } else {
+            } else{
                 revertMove(move);
             }
             tries++;
@@ -45,6 +56,16 @@ public abstract class AlgorithmStrategy {
         }
         return move;
     }
+
+    public Move generateMove() {
+        if (movePool == null) {
+            movePool = generateMoves();
+        }
+        if (movePool.isEmpty()) {
+            return bestMove;
+        }
+        return movePool.removeFirst();
+    }
     
     void executeMove(Move move) {
         District srcDistrict = move.getSourceDistrict();
@@ -53,6 +74,7 @@ public abstract class AlgorithmStrategy {
 
         srcDistrict.removePrecinct(precinct);
         destDistrict.addPrecinct(precinct);
+        moveHistory.addLast(move);
     }
 
     void revertMove(Move move) {
@@ -62,5 +84,18 @@ public abstract class AlgorithmStrategy {
 
         srcDistrict.addPrecinct(precinct);
         destDistrict.removePrecinct(precinct);
+        moveHistory.removeLast();
+    }
+
+    public void acceptMove(Move move) {
+        move.setObjectiveDelta(currObjValDelta);
+        if (currObjValDelta > 0) {
+            temperature -= COOLING_RATE;
+        }
+        previousObjValue = currentObjValue;
+
+        movePool = null;
+        bestMove = null;
+        bestDelta = -Double.MAX_VALUE;
     }
 }

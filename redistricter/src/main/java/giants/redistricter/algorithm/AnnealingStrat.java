@@ -13,15 +13,14 @@ public class AnnealingStrat extends AlgorithmStrategy {
     @Autowired
     RandomService random;
 
-    Variation variation;
     Set<District> districts;
     int iterations = 0;
     final int MAX_ITERATIONS = 5000;
+    int losingStreak = 0;
+    final int MAX_LOSING_STREAK = 50;
     final double CONVERGED_DELTA_VAL = 0.01;
+    double past_objective = 0.0;
     double temperature = 1.0;
-    double currentObjValue = 0.0;
-    double previousObjValue = 0.0;
-    double currObjValDelta = Double.MAX_VALUE;
     List<Move> moves;
 
     public AnnealingStrat(State state, ObjectiveFunction objFct,
@@ -30,9 +29,16 @@ public class AnnealingStrat extends AlgorithmStrategy {
         this.random = random;
         this.objFct = objFct;
         this.variation = variation;
-        this.districts = state.getDistricts().stream()
-                .map(District::new)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        this.districts = new LinkedHashSet<>();
+
+        for (District origDistrict : state.getDistricts()) {
+            District newDistrict = new District(origDistrict);
+            for (Precinct precinct : newDistrict.getPrecincts()) {
+                precinct.setDistrictId(newDistrict.getDistrictId());
+                precinct.setDistrict(newDistrict);
+            }
+            districts.add(newDistrict);
+        }
 
         currentObjValue = objFct.calculateObjectiveValue(districts);
     }
@@ -43,56 +49,61 @@ public class AnnealingStrat extends AlgorithmStrategy {
     }
 
     @Override
-    public Move generateMove() {
-        District srcDistrict;
-        Precinct precinct;
-        District destDistrict = null;
-        Move move;
+    public Deque<Move> generateMoves() {
+        Deque<Move> moves = new LinkedList<>();
 
-        // FIXME flawed logic
-        srcDistrict = random.select(districts);
-        if (srcDistrict.getPrecincts().isEmpty()){
-            //I was gonna have a while statement to try to get more districts but it messes with the lambda statement down below.
-            return null;
+        boolean badDist = true;
+        District dist = null;
+        while (badDist) {
+            dist = random.select(districts);
+            badDist = dist.getPrecincts().size() <= 1;
         }
-        precinct = random.select(srcDistrict.getBorderPrecincts());
-        Set<Precinct> neighbors = precinct.getNeighbors().keySet()
-                .stream()
-                .filter(p -> !srcDistrict.getPrecincts().contains(p))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-        Precinct neighbor = random.select(neighbors);
-        // Consider storing a lookup table to map precincts to their districts
-        for (District district : districts) {
-            if (district.getPrecincts().contains(neighbor)) {
-                destDistrict = district;
-                break;
-            }
-        }
-        if (destDistrict == null) {
-            assert false : "Precinct without district: " + precinct;
-        }
+        District srcDistrict = dist;
+        srcDistrict.getBorderPrecincts().stream()
+                .forEach(precinct -> {
+                    precinct.getNeighbors().keySet().stream()
+                            .filter(n -> n.getDistrict() != srcDistrict)
+                            .map(Precinct::getDistrict)
+                            .distinct()
+                            .forEach(destDistrict -> {
+                                Move move = new Move();
+                                move.setSourceDistrict(srcDistrict);
+                                move.setDestinationDistrict(destDistrict);
+                                move.setPrecinct(precinct);
+                                moves.add(move);
+                            });
+                });
 
-        move = new Move();
-        move.setSourceDistrict(srcDistrict);
-        move.setPrecinct(precinct);
-        move.setDestinationDistrict(destDistrict);
-        return move;
+        return moves;
     }
 
     @Override
-    public boolean isAcceptable() {
+    public boolean isAcceptable(Move move) {
         currentObjValue = objFct.calculateObjectiveValue(getDistricts());
+        currObjValDelta = currentObjValue - previousObjValue;
+        if (currObjValDelta >= bestDelta) {
+            bestDelta = currObjValDelta;
+            bestMove = moveHistory.getLast();
+        }
+//        if (move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
+//            return false;
+//        }
         switch (this.variation) {
             case ANY_ACCEPT:
                 return true;
 
             case GREEDY_ACCEPT:
-                return currentObjValue > previousObjValue;
+                assert movePool != null : "null movePool in isAcceptable()";
+                return currObjValDelta > 0
+                        || movePool.isEmpty()
+                        && bestMove == moveHistory.getLast();
 
             case PROBABILISTIC_ACCEPT:
-                // TODO actual probability
-                return previousObjValue == 0.0
-                        || currentObjValue / previousObjValue > temperature;
+                return previousObjValue == 0
+                        || currObjValDelta > 0
+                        || currentObjValue / previousObjValue < random.nextDouble()*temperature
+                        || movePool.isEmpty()
+                        && bestMove == moveHistory.getLast();
 
             default:
                 assert false : "Invalid Variation";
@@ -102,17 +113,22 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
     @Override
     public void acceptMove(Move move) {
-        currObjValDelta = currentObjValue - previousObjValue;
-        move.setObjectiveDelta(currObjValDelta);
-        if (previousObjValue > currentObjValue) {
-            temperature -= COOLING_RATE;
+        super.acceptMove(move);
+        if (currObjValDelta < 0) {
+            losingStreak++;
         }
-        previousObjValue = currentObjValue;
+        else {
+            losingStreak = 0;
+        }
+        System.err.println(currentObjValue);
         iterations++;
     }
 
     @Override
     public boolean isComplete() {
+        if (losingStreak > MAX_LOSING_STREAK) {
+            return true;
+        }
         return iterations > MAX_ITERATIONS;
     }
 }

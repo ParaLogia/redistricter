@@ -357,7 +357,7 @@ export class MapComponentComponent implements OnInit {
             selectedPrecinct.id = feature.properties.id;
             selectedPrecinct.population = feature.properties.population;
             selectedPrecinct.democratVotes = Math.floor(feature.properties.votes['2016'].DEMOCRAT);
-            selectedPrecinct.republicanVotes = Math.floor((feature.properties.votes['2016'].REPUBLICAN);
+            selectedPrecinct.republicanVotes = Math.floor((feature.properties.votes['2016'].REPUBLICAN));
           });
         },
         style: {
