@@ -8,6 +8,7 @@ import javax.persistence.Persistence;
 
 import org.springframework.stereotype.Service;
 
+import giants.redistricter.data.Demographics;
 import giants.redistricter.data.District;
 import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
@@ -41,6 +42,10 @@ public class DatabaseService {
     
     public List<Precinct> getPrecinctsByDistrictsId(Integer precinctId){
         return em.createQuery("SELECT precinct FROM Precinct precinct where precinct.districtId = :value1", Precinct.class).setParameter("value1", precinctId).getResultList();
+    }
+    
+    public List<Demographics> getDemographicsByPrecinctId(Integer precinctId){
+        return em.createQuery("SELECT demographic FROM Demographics demographic where demographic.precinctId = :value1", Demographics.class).setParameter("value1", precinctId).getResultList();
     }
 		
 }
