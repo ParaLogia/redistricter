@@ -70,7 +70,7 @@ public class GrowingStrat extends AlgorithmStrategy {
 
                 districts.add(district);
                 numSeeds--;
-                if (numSeeds < 0) {
+                if (numSeeds <= 0) {
                     break;
                 }
             }
