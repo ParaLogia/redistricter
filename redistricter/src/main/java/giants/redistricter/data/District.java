@@ -265,7 +265,7 @@ public class District {
         if (!immediateAdjacency(precinct)){
             return contiguousGraph(precinct);
         } else {
-            return false;
+            return true;
         }
     }
     private Boolean immediateAdjacency(Precinct precinct){
@@ -289,7 +289,7 @@ public class District {
     }
     private boolean[] miniPrecinctDFS(ArrayList<Precinct> adjacents,Precinct precinct,boolean[] visited){
         //i hate this
-        if (adjacents.contains(precinct)) {
+        if (adjacents.contains(precinct) && visited[adjacents.indexOf(precinct)] == false) {
             visited[adjacents.indexOf(precinct)] = true;
             precinct.getNeighbors().forEach((p, b) -> {
                 if (p.getDistrict().getDistrictId().equals(this.districtId)) {
@@ -304,30 +304,43 @@ public class District {
         //rip duplicate code
         //this check is going to be very slow
         ArrayList<Precinct> borderP = new ArrayList<>();
+        ArrayList<Precinct> adjacents = new ArrayList<>();
+        precinct.getNeighbors().forEach((p,b) -> {
+            if(p.getDistrict().getDistrictId().equals(this.districtId)){
+                adjacents.add(p);
+            }
+        });
         borderP.addAll(borderPrecincts);
 
         boolean visited[] = new boolean[borderP.size()];
-        visited[borderP.indexOf(precinct)]=true;
-        visited = bigPrecinctDFS(borderP,borderP.get(0),visited);
+        boolean visitedAdj[] = new boolean[adjacents.size()];
+        if (borderP.contains(precinct)){
+            visited[borderP.indexOf(precinct)]=true;
+        }
+        visitedAdj = bigPrecinctDFS(borderP,adjacents,adjacents.get(0),visited,visitedAdj);
 
         boolean check = true;
-        for (int i=0; i<visited.length;i++){
-            if(!visited[i]){
+        for (int i=0; i<visitedAdj.length;i++){
+            if(!visitedAdj[i]){
                 check = false;
             }
         }
         return check;
     }
-    private boolean[] bigPrecinctDFS(ArrayList<Precinct> borderP,Precinct precinct,boolean[] visited){
+    private boolean[] bigPrecinctDFS(ArrayList<Precinct> borderP,ArrayList<Precinct> adjacents,Precinct precinct,boolean[] visited,boolean[] visitedAdj){
         //i think this works
-        if (borderP.contains(precinct)) {
+        System.out.println("PRECINCT ID" + precinct.getId());
+        if (borderP.contains(precinct) && visited[borderP.indexOf(precinct)] == false) {
             visited[borderP.indexOf(precinct)] = true;
-        }
-        precinct.getNeighbors().forEach((p, b) -> {
-            if (p.getDistrict().getDistrictId().equals(this.districtId)) {
-                miniPrecinctDFS(borderP, p, visited);
+            if (adjacents.contains(precinct)){
+                visitedAdj[adjacents.indexOf(precinct)] = true;
             }
-        });
-        return visited;
+            precinct.getNeighbors().forEach((p, b) -> {
+                if (p.getDistrict().getDistrictId().equals(this.districtId)) {
+                    bigPrecinctDFS(borderP, adjacents,p, visited,visitedAdj);
+                }
+            });
+        }
+        return visitedAdj;
     }
 }
