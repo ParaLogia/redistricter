@@ -32,7 +32,7 @@ public class MainController {
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(path = "/select")
     public State select(@RequestParam String state) {
-        return stateLoader.getStateByShortName(state);
+        return new JsonStateLoader().getStateByShortName(state);
     }
 
     @CrossOrigin(origins = "http://localhost:4200")

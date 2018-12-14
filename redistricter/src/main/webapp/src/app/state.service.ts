@@ -5,7 +5,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 
 import { environment } from '../environments/environment';
-import { states } from './models/states';
+
 
 declare var require: any;
 
@@ -33,7 +33,7 @@ export class StateService {
         return require('../assets/districts/co_dists_geo.json');
       }
       case 'New Hampshire': {
-        return require('../assets/districts/nh_dists_geo.json');
+        return require('../assets/districts/nh_precincts_final.json');
       }
       case 'New York': {
         return require('../assets/districts/ny_dists_geo.json');
