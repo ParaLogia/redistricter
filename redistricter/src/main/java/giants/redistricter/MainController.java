@@ -44,7 +44,7 @@ public class MainController {
         State state;
         if (stateName.startsWith("MOCK")) {
             String[] args = stateName.split(" ");
-            state = mockStateLoader.loadState(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+            state = mockStateLoader.loadMockState(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         }
         else {
             state = stateLoader.getStateByShortName(stateName);

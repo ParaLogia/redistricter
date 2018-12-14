@@ -1,5 +1,6 @@
 package giants.redistricter.data;
 
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -37,7 +38,8 @@ public class State {
     @Transient
     Integer population;
     @Transient
-    Set<ElectionResult> votes;
+    Map<Party, Integer> votes;
+
     public String getShortName() {
         return this.shortName;
     }
@@ -95,11 +97,11 @@ public class State {
         this.population = population;
     }
 
-    public Set<ElectionResult> getVotes() {
+    public Map<Party, Integer> getVotes() {
         return votes;
     }
 
-    public void setVotes(Set<ElectionResult> votes) {
+    public void setVotes(Map<Party, Integer> votes) {
         this.votes = votes;
     }
 }
