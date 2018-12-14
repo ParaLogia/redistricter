@@ -71,6 +71,36 @@ public class GrowingStrat extends AlgorithmStrategy {
     }
 
     @Override
+    public boolean isAcceptable(Move move) {
+        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
+        currObjValDelta = currentObjValue - previousObjValue;
+        if (currObjValDelta >= bestDelta) {
+            bestDelta = currObjValDelta;
+            bestMove = moveHistory.getLast();
+        }
+
+        switch (this.variation) {
+            case ANY_ACCEPT:
+                return true;
+
+            case GREEDY_ACCEPT:
+                assert movePool != null : "null movePool in isAcceptable()";
+                return currObjValDelta > 0
+                        || movePool.isEmpty()
+                        && bestMove == moveHistory.getLast();
+
+            case PROBABILISTIC_ACCEPT:
+                // TODO actual probability
+                return previousObjValue == 0
+                        || currentObjValue / previousObjValue > temperature;
+
+            default:
+                assert false : "Invalid Variation";
+                return false;
+        }
+    }
+
+    @Override
     public Set<District> getDistricts() {
         // Consider returning the precinct pool as well?
         return districts;

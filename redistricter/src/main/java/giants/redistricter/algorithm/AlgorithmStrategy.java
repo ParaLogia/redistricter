@@ -29,6 +29,7 @@ public abstract class AlgorithmStrategy {
     abstract Set<District> getDistricts();
     abstract Deque<Move> generateMoves();
     abstract boolean isComplete();
+    abstract boolean isAcceptable(Move move);
 
     public Move nextMove() {
         Move move = null;
@@ -42,12 +43,9 @@ public abstract class AlgorithmStrategy {
         while (!accepted) {
             move = generateMove();
             executeMove(move);
-            //contiguity might break it, remove if doesn't work.
-            if (isAcceptable()) {
-//                if (move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
+            if (isAcceptable(move)) {
                     acceptMove(move);
                     accepted = true;
-//                }
             } else{
                 revertMove(move);
             }
@@ -87,35 +85,6 @@ public abstract class AlgorithmStrategy {
         srcDistrict.addPrecinct(precinct);
         destDistrict.removePrecinct(precinct);
         moveHistory.removeLast();
-    }
-
-    public boolean isAcceptable() {
-        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
-        currObjValDelta = currentObjValue - previousObjValue;
-        if (currObjValDelta >= bestDelta) {
-            bestDelta = currObjValDelta;
-            bestMove = moveHistory.getLast();
-        }
-
-        switch (this.variation) {
-            case ANY_ACCEPT:
-                return true;
-
-            case GREEDY_ACCEPT:
-                assert movePool != null : "null movePool in isAcceptable()";
-                return currObjValDelta > 0
-                        || movePool.isEmpty()
-                            && bestMove == moveHistory.getLast();
-
-            case PROBABILISTIC_ACCEPT:
-                // TODO actual probability
-                return previousObjValue == 0
-                        || currentObjValue / previousObjValue > temperature;
-
-            default:
-                assert false : "Invalid Variation";
-                return false;
-        }
     }
 
     public void acceptMove(Move move) {
