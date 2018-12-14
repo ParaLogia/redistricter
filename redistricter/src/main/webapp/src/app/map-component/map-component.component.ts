@@ -46,6 +46,7 @@ export class MapComponentComponent implements OnInit {
   public algorithmInProgress: boolean;
 
   public randomSeed: number;
+  public searchTerm: string;
 
   public statesData: any;
 
@@ -183,7 +184,18 @@ export class MapComponentComponent implements OnInit {
   public startAlgorithm() {
     this.algorithmInProgress = true;
     this.lockObjectives = true;
-    this.http.post(environment.apiBaseUrl + "/start", this.stateService.state).toPromise()
+
+    let algorithmInfo = {
+      "abbreviation" : this.stateService.state,
+      'weights' : {
+        'POPULATION_FAIRNESS' : 0.4
+      },
+      'algorithm' : this.selectedAlgorithm,
+      'variation' : 'ANY_ACCEPT',
+      'seed' : 12345
+    };
+
+    this.http.post(environment.apiBaseUrl + "/start", algorithmInfo).toPromise()
       .then( (res) => {
         // Algo return set of districts
         this.initializeDistricts(res);

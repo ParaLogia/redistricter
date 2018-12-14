@@ -18,6 +18,16 @@
   <div>
     <mat-card m-b-20 style="height:8w0px;">
       <div m-r-30>
+
+ <mat-form-field m-r-20>
+                <input
+                  matInput
+                  placeholder="Search" name="searchTerm"
+                  [disabled]="this.lockObjectives"
+                  [(ngModel)] = "this.searchTerm"
+                />
+              </mat-form-field>
+
         <mat-form-field style="width:300px;" m-l-30>
           <mat-select
             name="stateDDL"

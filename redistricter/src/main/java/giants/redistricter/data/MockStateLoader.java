@@ -1,39 +1,26 @@
 package giants.redistricter.data;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import giants.redistricter.algorithm.ObjectiveCriteria;
 import giants.redistricter.algorithm.ObjectiveFunction;
 import giants.redistricter.algorithm.ObjectiveFunctionBuilder;
+import org.springframework.boot.json.GsonJsonParser;
+import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.stereotype.Repository;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class MockStateLoader {
-    public static void main(String... args) {
-        State state = new MockStateLoader().loadState("Mock", 24, 8);
-        ObjectiveFunction objective = new ObjectiveFunctionBuilder()
-                .addWeight(ObjectiveCriteria.POLSBY_POPPER, 0.3)
-                .addWeight(ObjectiveCriteria.POPULATION_FAIRNESS, 0.7)
-                .build();
-        Set<District> districts = state.getDistricts();
-//        districts.iterator().next().setPopulation(0);
-        for (District d : districts) {
-//            System.out.println("District " + d.getDistrictId());
-//            System.out.println(d.getVotes());
-            System.out.println("Population: " + d.getPopulation());
-            System.out.println("Area: " + d.getArea());
-            System.out.println("Perimeter: " + d.getPerimeter());
-//            System.out.println("Interior Border Precincts: " + d.getBorderPrecincts().size());
-            System.out.println("Precincts: " + d.getPrecincts().size());
-        }
-        System.out.println("Objective val: " + objective.calculateObjectiveValue(districts));
-    }
+
 
     /* Create a mock state with precincts arranged in a square grid */
-    public State loadState(String name, int width, int numDists) {
+    public State loadMockState(String name, int width, int numDists) {
 
         Set<Precinct> precincts = new LinkedHashSet<>();
         Precinct[][] precArr = new Precinct[width][width];
@@ -58,8 +45,7 @@ public class MockStateLoader {
                 LinkedHashMap<Precinct, Border> neighbors = new LinkedHashMap<>();
 
                 // Bad practice, but we'll assume Borders are immutable
-                Border border = new Border();
-                border.setLength(1.0);
+                Border border = new Border(1.0);
                 if (i > 0) {
                     neighbors.put(precArr[i-1][j], border);
                 }
@@ -89,7 +75,7 @@ public class MockStateLoader {
             }
             districts.add(d);
         }
-        assert !precinctIterator.hasNext() : "Unassigned Precincts in MockStateLoader.loadState";
+        assert !precinctIterator.hasNext() : "Unassigned Precincts in MockStateLoader.loadMockState";
 
         State state = new State();
         state.setName(name);
@@ -98,4 +84,6 @@ public class MockStateLoader {
 
         return state;
     }
+
+
 }

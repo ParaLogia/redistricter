@@ -164,15 +164,22 @@ public class District {
         int population = precinct.getPopulation();
         double area = precinct.getArea();
         Map<Party, Integer> votes = precinct.getVotes();
+        Map<Demographic, Integer> demographics = precinct.getDemographics();
         Map<Precinct, Border> neighbors = precinct.getNeighbors();
         boolean borderPrecinct = false;
 
         precincts.remove(precinct);
         this.population -= population;
         this.area -= area;
+
         votes.forEach((party, count) -> {
             this.votes.merge(party, count, (total, partial) -> total - partial);
         });
+
+        demographics.forEach((demographic, count) -> {
+            this.demographics.merge(demographic, count, (total, partial) -> total - partial);
+        });
+
         perimeter -= precinct.getPerimeter();
         for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
             Precinct neighbor = entry.getKey();
@@ -190,6 +197,7 @@ public class District {
         int population = precinct.getPopulation();
         double area = precinct.getArea();
         Map<Party, Integer> votes = precinct.getVotes();
+        Map<Demographic, Integer> demographics = precinct.getDemographics();
         Map<Precinct, Border> neighbors = precinct.getNeighbors();
         boolean borderPrecinct = false;
         //don't add for remove, or it might break some other code. Just becareful.
@@ -198,9 +206,15 @@ public class District {
         precincts.add(precinct);
         this.population += population;
         this.area += area;
+
         votes.forEach((party, count) -> {
             this.votes.merge(party, count, (total, partial) -> total + partial);
         });
+
+        demographics.forEach((demographic, count) -> {
+            this.demographics.merge(demographic, count, (total, partial) -> total + partial);
+        });
+
         perimeter += precinct.getPerimeter();
         for (Map.Entry<Precinct, Border> entry : neighbors.entrySet()) {
             Precinct neighbor = entry.getKey();
