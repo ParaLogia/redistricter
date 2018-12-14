@@ -1,22 +1,22 @@
 import requests
 import json
+from collections import defaultdict
 
 session = requests.Session()
 
-width = 10
-ndists = 2
 
 startdata = \
 {
-    "abbreviation": f"nh",
+    "abbreviation": "ny",
     "weights": {
-        "POLSBY_POPPER": 0.0,
-        "POPULATION_FAIRNESS": 1.0
+        "POLSBY_POPPER": 0.5,
+        "POPULATION_FAIRNESS": 0.5
     },
     "algorithm": "REGION_GROWING",
-    "districts": 4,
-    "variation": "PROBABILISTIC_ACCEPT",
-    "seed": 123456
+    "districts": 20,
+    "variation": "GREEDY_ACCEPT",
+    "seed": 1234,
+    "year": 2000,
 }
 
 
@@ -40,42 +40,21 @@ def next():
     return json.loads(response.text)
 
 
-def mock_test():
-    dists = start()
-    i = 0
-    while True:
-        move = next()
-        if not move:
-            break
-        i += 1
-        if i % 100 == 0:
-            print(f'move {i}')
-        dstdist = move['destinationDistrict']
-        srcdist = move['sourceDistrict']
-        dists[int(dstdist)-1]['precincts'].append(move['precinct'])
-        if srcdist > 0:
-            dists[int(srcdist)-1]['precincts'].remove(move['precinct'])
-#    print(dists)
-    print(f'{i} moves')
-    pds = {}
-    for dist in dists:
-        for p in dist['precincts']:
-            pds[p] = dist['id']
-    chars = ['$', '.', '/', ',', '#', "'", 'X','"'] + list('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.lower())
-    for y in range(width):
-        for x in range(width):
-            p = y*width + x
-            print(chars[pds[p]-1], end='')
-        print('')
-
+dists = defaultdict(list)
 
 def test():
+    global dists
     start()
     n = next()
     objVal = 0.0
+    i = 0
     while n:
-        print(n)
+        if i % 500 == 0:
+            print(i)
+            print('    ', n)
+        i += 1
         objVal += n['objectiveDelta']
+        dists[n['destinationDistrict']].append(n['precinct'])
         n = next()
     return objVal
 

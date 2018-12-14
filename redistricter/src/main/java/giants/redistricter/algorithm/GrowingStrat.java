@@ -10,14 +10,12 @@ import java.util.stream.Collectors;
 
 public class GrowingStrat extends AlgorithmStrategy {
     @Autowired
-    RandomService random;
+    private RandomService random;
 
-    Set<District> districts;
-    District precinctPool;
-    double temperature;
-    Variation variation;
-    double previousObjValue;
-    double currentObjValue;
+    private Set<District> districts;
+    private District precinctPool;
+
+    final int MAX_MOVE_POOL_SIZE = 150;
 
     public GrowingStrat(State state, ObjectiveFunction objFct,
                         Variation variation, RandomService random, int numSeeds){
@@ -75,47 +73,23 @@ public class GrowingStrat extends AlgorithmStrategy {
     }
 
     @Override
-    public Set<District> getDistricts() {
-        // Consider returning the precinct pool as well?
-        return districts;
-    }
-
-    @Override
-    public Move generateMove() {
-        List<Precinct> addablePrecincts;
-        Precinct precinctToAdd;
-        Move move = new Move();;
-
-        List<District> sortedPopDists = districts.stream()
-                .sorted(Comparator.comparing(District::getPopulation))
-                .collect(Collectors.toList());
-
-        for (District districtToGrow : sortedPopDists) {
-            Set<Precinct> borders = districtToGrow.getBorderPrecincts();
-            addablePrecincts = borders.stream()
-                    .flatMap(p -> p.getNeighbors().keySet().stream())
-                    .filter(p -> precinctPool.getPrecincts().contains(p))
-                    .collect(Collectors.toCollection(ArrayList::new));
-            if (addablePrecincts.size() > 0) {
-                precinctToAdd = random.select(addablePrecincts);
-                move.setSourceDistrict(precinctPool);
-                move.setDestinationDistrict(districtToGrow);
-                move.setPrecinct(precinctToAdd);
-                return move;
-            }
-        }
-        return move;
-    }
-
-    @Override
-    public boolean isAcceptable() {
+    public boolean isAcceptable(Move move) {
         currentObjValue = objFct.calculateObjectiveValue(getDistricts());
+        currObjValDelta = currentObjValue - previousObjValue;
+        if (currObjValDelta >= bestDelta) {
+            bestDelta = currObjValDelta;
+            bestMove = moveHistory.getLast();
+        }
+
         switch (this.variation) {
             case ANY_ACCEPT:
                 return true;
 
             case GREEDY_ACCEPT:
-                return currentObjValue > previousObjValue;
+                assert movePool != null : "null movePool in isAcceptable()";
+                return currObjValDelta > 0
+                        || movePool.isEmpty()
+                        && bestMove == moveHistory.getLast();
 
             case PROBABILISTIC_ACCEPT:
                 // TODO actual probability
@@ -129,13 +103,36 @@ public class GrowingStrat extends AlgorithmStrategy {
     }
 
     @Override
-    public void acceptMove(Move move) {
-        move.setObjectiveDelta(currentObjValue - previousObjValue);
-        if (previousObjValue > currentObjValue) {
-            temperature -= COOLING_RATE;
+    public Set<District> getDistricts() {
+        // Consider returning the precinct pool as well?
+        return districts;
+    }
+
+    @Override
+    public Deque<Move> generateMoves() {
+        Deque<Move> moves = new LinkedList<>();
+
+        List<District> sortedPopDists = districts.stream()
+                .sorted(Comparator.comparing(District::getPopulation))
+                .collect(Collectors.toList());
+
+        for (District districtToGrow : sortedPopDists) {
+            Set<Precinct> borders = districtToGrow.getBorderPrecincts();
+            borders.stream()
+                    .flatMap(p -> p.getNeighbors().keySet().stream())
+                    .filter(p -> precinctPool.getPrecincts().contains(p))
+                    .forEach(precinctToAdd -> {
+                        Move move = new Move();
+                        move.setSourceDistrict(precinctPool);
+                        move.setDestinationDistrict(districtToGrow);
+                        move.setPrecinct(precinctToAdd);
+                        moves.add(move);
+                    });
+            if (moves.size() > MAX_MOVE_POOL_SIZE) {
+                return moves;
+            }
         }
-        previousObjValue = currentObjValue;
-        temperature -= COOLING_RATE;
+        return moves;
     }
 
     @Override
