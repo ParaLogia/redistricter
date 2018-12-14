@@ -50,9 +50,9 @@ public abstract class AlgorithmStrategy {
                 revertMove(move);
             }
             tries++;
-//            if (tries >= max_tries) {
-//                return null;
-//            }
+            if (tries >= max_tries) {
+                return null;
+            }
         }
         return move;
     }

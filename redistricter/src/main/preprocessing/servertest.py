@@ -7,13 +7,13 @@ session = requests.Session()
 
 startdata = \
 {
-    "abbreviation": "ny",
+    "abbreviation": "nh",
     "weights": {
         "POLSBY_POPPER": 0.5,
         "POPULATION_FAIRNESS": 0.5
     },
-    "algorithm": "REGION_GROWING",
-    "districts": 20,
+    "algorithm": "SIMULATED_ANNEALING",
+    "districts": 2,
     "variation": "GREEDY_ACCEPT",
     "seed": 1234,
     "year": 2000,
@@ -49,7 +49,7 @@ def test():
     objVal = 0.0
     i = 0
     while n:
-        if i % 500 == 0:
+        if i % 500 == 0 or n['objectiveDelta'] > 0.5:
             print(i)
             print('    ', n)
         i += 1
