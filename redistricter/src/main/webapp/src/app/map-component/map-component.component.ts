@@ -32,8 +32,6 @@ export class MapComponentComponent implements OnInit {
     center: latLng([46.879966, -121.726909])
   };
 
-  // List of algorithms
-  public algorithms: string[] = ["Simulated Annealing", "Region Growing"];
 
   public statesDDL: DisplayState[];
 
@@ -185,15 +183,22 @@ export class MapComponentComponent implements OnInit {
     this.algorithmInProgress = true;
     this.lockObjectives = true;
 
+
     let algorithmInfo = {
-      "abbreviation" : this.stateService.state,
+      'abbreviation' : states.find(st => st.name === this.stateService.state.name).abbreviation,
       'weights' : {
-        'POPULATION_FAIRNESS' : 0.4
+        'POPULATION_FAIRNESS' : this.adminService.selectedAlgorithm.populationFairness / 100,
+        'POLSBY_POPPER' : this.adminService.selectedAlgorithm.polsbyPopper / 100,
+        'EFFICIENCY_GAP' : this.adminService.selectedAlgorithm.efficencyGap / 100,
+        'PROPORTIONALITY' : this.adminService.selectedAlgorithm.porportionality / 100
       },
-      'algorithm' : this.selectedAlgorithm,
-      'variation' : 'ANY_ACCEPT',
+      'algorithm' : this.adminService.selectedAlgorithm.name,
+      'variation' : this.adminService.selectedAlgorithm.variation,
       'seed' : 12345
     };
+
+    
+    console.log(algorithmInfo);
 
     this.http.post(environment.apiBaseUrl + "/start", algorithmInfo).toPromise()
       .then( (res) => {

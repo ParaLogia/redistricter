@@ -5,6 +5,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 
 import { environment } from '../environments/environment';
+import { states } from "./models/states";
 
 declare var require: any;
 
@@ -66,6 +67,7 @@ export class StateService {
 
   public setState(name: string): any {
     this.state.name = name;
+    this.state.abbreviation = states.find(st => st.name === this.state.name).abbreviation;
     this.getStateInfo(name);
     return this.getDistrictGeo(this.state.name);
   }
@@ -77,7 +79,7 @@ export class StateService {
     httpHeaders.append('Access-Control-Allow-Origin', '*');
 
     let httpParams = new HttpParams();
-    httpParams.append('state', 'New York');
+    httpParams.append('state', 'NY');
 
     this.http
       .get('http://localhost:8080/select', {

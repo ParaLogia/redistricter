@@ -174,20 +174,8 @@
             </p>
             <h4>Population</h4>
             <div sws-hr-sm--bold></div>
-            <span>
-              <p>Maximum Difference <i class="fas fa-info-circle"></i></p>
-            </span>
-            <mat-slider
-              thumbLabel
-              style="width: 300px;"
-              [disabled]="this.lockObjectives"
-              [displayWith]="percentFormat"
-              min="0"
-              max="100"
-              tickInterval="1"
-            ></mat-slider>
 
-            <p>Maximum Variance <i class="fas fa-info-circle"></i></p>
+            <p>Population Fairness<i class="fas fa-info-circle"></i></p>
             <mat-slider
               thumbLabel
               style="width: 300px;"
@@ -196,6 +184,8 @@
               min="0"
               max="100"
               tickInterval="1"
+              name="populationFairnessSlider"
+              [(ngModel)] = "this.adminService.selectedAlgorithm.populationFairness"
             ></mat-slider>
 
             <h4>Partisan Fairness</h4>
@@ -209,6 +199,8 @@
               min="0"
               max="100"
               tickInterval="1"
+              name="efficencyGapSlider"
+              [(ngModel)] = "this.adminService.selectedAlgorithm.efficencyGap"
             ></mat-slider>
 
             <p>Proportionality <i class="fas fa-info-circle"></i></p>
@@ -220,17 +212,8 @@
               min="0"
               max="100"
               tickInterval="1"
-            ></mat-slider>
-
-            <p>Mean-Median Difference <i class="fas fa-info-circle"></i></p>
-            <mat-slider
-              thumbLabel
-              style="width: 300px;"
-              [disabled]="this.lockObjectives"
-              [displayWith]="percentFormat"
-              min="0"
-              max="100"
-              tickInterval="1"
+              name="porpotionalitySlider"
+              [(ngModel)]="this.adminService.selectedAlgorithm.porportionality"
             ></mat-slider>
 
             <h4>Compactness</h4>
@@ -244,6 +227,8 @@
               min="0"
               max="100"
               tickInterval="1"
+              name="polsbyPopperSlider"
+              [(ngModel)]="this.adminService.selectedAlgorithm.polsbyPopper"
             ></mat-slider>
           </div>
         </mat-tab>
@@ -255,18 +240,17 @@
                 placeholder="Algorithm"
                 name="algoDDL"
                 id="algoDDL"
-                [(ngModel)]="selectedAlgorithm"
+                [(ngModel)]="this.adminService.selectedAlgorithm.name"
               >
-                <mat-option *ngFor="let algo of algorithms" [value]="algo">
-                  {{ algo }}
-                </mat-option>
+              <mat-option [value]="'SIMULATED_ANNEALING'"> Simulated Annealing</mat-option>
+              <mat-option [value]="'REGION_GROWING'"> Region Growing</mat-option>
               </mat-select>
             </mat-form-field>
             <span *ngIf="!algorithmInProgress"
               ><button
                 mat-raised-button
                 color="primary"
-                [disabled]="selectedAlgorithm === undefined"
+                [disabled]="this.adminService.selectedAlgorithm.name === undefined || this.adminService.selectedAlgorithm.variation === undefined"
                 (click)="startAlgorithm()"
               >
                 Start
@@ -276,13 +260,25 @@
               ><button
                 mat-raised-button
                 color="warn"
-                [disabled]="selectedAlgorithm === undefined"
+                [disabled]="this.adminService.selectedAlgorithm.name === undefined || this.adminService.selectedAlgorithm.variation === undefined"
                 (click)="pauseAlgorithm()"
               >
                 Pause
               </button></span
             >
-
+              <div>
+                  <mat-form-field m-r-20>
+                      <mat-select
+                        placeholder="Variation"
+                        name="variationDLL"
+                        id="variationDDL"
+                        [(ngModel)]="this.adminService.selectedAlgorithm.variation"
+                      >
+                      <mat-option [value]="'GREEDY_ACCEPT'"> Greedy Accept</mat-option>
+                      <mat-option [value]="'PROBABILISTIC_ACCEPT'"> Probabalistic Accept</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+              </div>
             <div>
               <mat-form-field m-r-20>
                 <input
