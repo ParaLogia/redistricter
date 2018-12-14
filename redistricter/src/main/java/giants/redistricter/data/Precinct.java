@@ -39,6 +39,7 @@ public class Precinct {
     private Map<Integer,Map<Party, Integer>> votes;
     @Transient
     private Map<Demographic,Integer> demographics;
+
     public Integer getId() {
         return id;
     }
