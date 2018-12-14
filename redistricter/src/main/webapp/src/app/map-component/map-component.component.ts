@@ -6,7 +6,7 @@ import { states } from "../models/states";
 import { statesData } from "../models/state-geo";
 
 import * as L from "leaflet";
-import { environment } from '../../environments/environment';
+import { environment } from "../../environments/environment";
 
 // @ts-ignore
 import _ from "leaflet-search";
@@ -31,7 +31,6 @@ export class MapComponentComponent implements OnInit {
     zoom: 7,
     center: latLng([46.879966, -121.726909])
   };
-
 
   public statesDDL: DisplayState[];
 
@@ -107,7 +106,6 @@ export class MapComponentComponent implements OnInit {
 
     // info.addTo(this.mymap);
 
-
     // let hey = L.Control.Search;
     // console.log(hey);
 
@@ -154,10 +152,6 @@ export class MapComponentComponent implements OnInit {
           }
         });
 
-        function hello() {
-          console.log("hello");
-        }
-
         function processCoord(coords) {
           let coords1 = [];
           for (var i = 0; i < coords[0].length; i++) {
@@ -183,32 +177,37 @@ export class MapComponentComponent implements OnInit {
     this.algorithmInProgress = true;
     this.lockObjectives = true;
 
-
     let algorithmInfo = {
-      'abbreviation' : states.find(st => st.name === this.stateService.state.name).abbreviation,
-      'weights' : {
-        'POPULATION_FAIRNESS' : this.adminService.selectedAlgorithm.populationFairness / 100,
-        'POLSBY_POPPER' : this.adminService.selectedAlgorithm.polsbyPopper / 100,
-        'EFFICIENCY_GAP' : this.adminService.selectedAlgorithm.efficencyGap / 100,
-        'PROPORTIONALITY' : this.adminService.selectedAlgorithm.porportionality / 100
+      abbreviation: states.find(st => st.name === this.stateService.state.name)
+        .abbreviation,
+      weights: {
+        POPULATION_FAIRNESS:
+          this.adminService.selectedAlgorithm.populationFairness / 100,
+        POLSBY_POPPER: this.adminService.selectedAlgorithm.polsbyPopper / 100,
+        EFFICIENCY_GAP: this.adminService.selectedAlgorithm.efficencyGap / 100,
+        PROPORTIONALITY:
+          this.adminService.selectedAlgorithm.porportionality / 100
       },
-      'algorithm' : this.adminService.selectedAlgorithm.name,
-      'variation' : this.adminService.selectedAlgorithm.variation,
-      'seed' : 12345
+      algorithm: this.adminService.selectedAlgorithm.name,
+      variation: this.adminService.selectedAlgorithm.variation,
+      seed: 12345
     };
 
-    
     console.log(algorithmInfo);
 
-    this.http.post(environment.apiBaseUrl + "/start", algorithmInfo).toPromise()
-      .then( (res) => {
-        // Algo return set of districts
-        this.initializeDistricts(res);
-      },
-      // If an error occurs, log it
-      (err) => {
-        console.log("error: " + err);
-      });
+    this.http
+      .post(environment.apiBaseUrl + "/start", algorithmInfo)
+      .toPromise()
+      .then(
+        res => {
+          // Algo return set of districts
+          this.initializeDistricts(res);
+        },
+        // If an error occurs, log it
+        err => {
+          console.log("error: " + err);
+        }
+      );
   }
 
   public pauseAlgorithm() {
@@ -252,8 +251,10 @@ export class MapComponentComponent implements OnInit {
     this.stateService.state.numPrecincts = this.statesData.features[
       stateIndex
     ].geometry.coordinates[0].length;
-    
-    this.stateService.state.abbreviation = states.find(st => st.name === this.stateService.state.name).abbreviation;
+
+    this.stateService.state.abbreviation = states.find(
+      st => st.name === this.stateService.state.name
+    ).abbreviation;
   }
 
   public processCoordinates(index: number): any[] {
@@ -304,22 +305,36 @@ export class MapComponentComponent implements OnInit {
     this.enablePrecinctToggle = false;
   }
 
-public search(): void {
-  console.log("yes");
-  let url = 'http://nominatim.openstreetmap.org/search?format=json&q=' + 'Brooklyn';
-  this.http
+  public search(): void {
+    if (this.searchTerm === undefined) {
+      return;
+    }
+
+    let url =
+      "http://nominatim.openstreetmap.org/search?format=json&q=" + this.searchTerm;
+    this.http
       .get(url)
       .toPromise()
       .then(
-        (res) => {
+        res => {
           // Populate state data from backend
-         console.log( JSON.parse(res['_body'])[0]['lat'] );
+          if (JSON.parse(res["_body"])[0] !== undefined )
+          {
+          console.log(JSON.parse(res["_body"])[0]["lat"]);
+          console.log(JSON.parse(res["_body"])[0]["lon"]);
+          this.mymap.setView(
+            [
+              JSON.parse(res["_body"])[0]["lat"],
+              JSON.parse(res["_body"])[0]["lon"]
+            ],
+            12
+          );
+          }
         },
         // If an error occurs, log it
         err => {
-          console.log('error: ' + err);
+          console.log("error: " + err);
         }
       );
-}
-  
+  }
 }
