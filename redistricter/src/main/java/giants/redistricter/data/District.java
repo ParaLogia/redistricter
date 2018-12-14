@@ -44,7 +44,7 @@ public class District {
     @Transient
     Map<Demographic,Integer> demographics;
     @Transient
-    Map<Party,Integer> votes;
+    Map<Integer, Map<Party,Integer>> votes;
 
     public District() {
         this.votes = new LinkedHashMap<>();
@@ -76,7 +76,7 @@ public class District {
         this.area =  other.area;
         this.perimeter = other.perimeter;
         this.demographics = new HashMap<Demographic,Integer>(other.getDemographics());
-        this.votes = new HashMap<Party,Integer>(other.getVotes());
+        this.votes = new LinkedHashMap<>(other.getVotes());
     }
 
     public Integer getStateId() {
@@ -151,11 +151,11 @@ public class District {
         this.demographics = demographics;
     }
 
-    public Map<Party, Integer> getVotes() {
+    public Map<Integer, Map<Party, Integer>> getVotes() {
         return votes;
     }
 
-    public void setVotes(Map<Party, Integer> votes) {
+    public void setVotes(Map<Integer, Map<Party, Integer>> votes) {
         this.votes = votes;
     }
 
@@ -163,7 +163,7 @@ public class District {
     public void removePrecinct(Precinct precinct) {
         int population = precinct.getPopulation();
         double area = precinct.getArea();
-        Map<Party, Integer> votes = precinct.getVotes();
+        Map<Integer, Map<Party, Integer>> votes = precinct.getVotes();
         Map<Demographic, Integer> demographics = precinct.getDemographics();
         Map<Precinct, Border> neighbors = precinct.getNeighbors();
         boolean borderPrecinct = false;
@@ -172,8 +172,16 @@ public class District {
         this.population -= population;
         this.area -= area;
 
-        votes.forEach((party, count) -> {
-            this.votes.merge(party, count, (total, partial) -> total - partial);
+//        votes.forEach((party, count) -> {
+//            this.votes.merge(party, count, (total, partial) -> total - partial);
+//        });
+        votes.forEach((yr, pvotes) -> {
+            this.votes.merge(yr, pvotes, (currPVotes, newPVotes) -> {
+                newPVotes.forEach((party, count) -> {
+                    currPVotes.merge(party, count, (total, partial) -> total - partial);
+                });
+                return currPVotes;
+            });
         });
 
         demographics.forEach((demographic, count) -> {
@@ -196,7 +204,7 @@ public class District {
     public void addPrecinct(Precinct precinct){
         int population = precinct.getPopulation();
         double area = precinct.getArea();
-        Map<Party, Integer> votes = precinct.getVotes();
+        Map<Integer, Map<Party, Integer>> votes = precinct.getVotes();
         Map<Demographic, Integer> demographics = precinct.getDemographics();
         Map<Precinct, Border> neighbors = precinct.getNeighbors();
         boolean borderPrecinct = false;
@@ -207,8 +215,13 @@ public class District {
         this.population += population;
         this.area += area;
 
-        votes.forEach((party, count) -> {
-            this.votes.merge(party, count, (total, partial) -> total + partial);
+        votes.forEach((yr, pvotes) -> {
+            this.votes.merge(yr, pvotes, (currPVotes, newPVotes) -> {
+                newPVotes.forEach((party, count) -> {
+                    currPVotes.merge(party, count, (total, partial) -> total + partial);
+                });
+                return currPVotes;
+            });
         });
 
         demographics.forEach((demographic, count) -> {

@@ -14,6 +14,9 @@ public class ObjectiveFunction {
     private Map<ObjectiveCriteria, Double> weights;
     private Map<ObjectiveCriteria,Function<Set<District>,Double>> functions;
 
+    // TODO build
+    private int year = 1998;
+
     public ObjectiveFunction(Map<ObjectiveCriteria, Double> weights) {
         this.weights = weights;
         functions = new LinkedHashMap<>();
@@ -117,9 +120,11 @@ public class ObjectiveFunction {
         //based on wasted votes.
         //need access to the votes from each district.
         double total = 0.0;
+
         for (District d:districts) {
+            Map<Party, Integer> votes = d.getVotes().get(year);
             int winningPartyVotes = 0;
-            for (Map.Entry<Party,Integer> entry: d.getVotes().entrySet()){
+            for (Map.Entry<Party,Integer> entry: votes.entrySet()){
                 if (winningPartyVotes < entry.getValue()){
                     winningPartyVotes = entry.getValue();
                 }
@@ -152,8 +157,9 @@ public class ObjectiveFunction {
         double repWins = 0;
         double demoWins = 0;
         for (District d: districts){
-            Map.Entry<Party,Integer> highestEntry = d.getVotes().entrySet().iterator().next();
-            for(Map.Entry<Party,Integer> entry: d.getVotes().entrySet()){
+            Map<Party, Integer> votes = d.getVotes().get(year);
+            Map.Entry<Party,Integer> highestEntry = votes.entrySet().iterator().next();
+            for(Map.Entry<Party,Integer> entry: votes.entrySet()){
                 if (entry.getValue() > highestEntry.getValue()){
                     highestEntry = entry;
                 }

@@ -17,7 +17,7 @@ public class JsonStateLoader {
 
     public static void main(String... args) {
         State state;
-        state = new JsonStateLoader().getStateByShortName("ny", 1998);
+        state = new JsonStateLoader().getStateByShortName("ny");
 
         System.out.println("Name: " + state.getName());
         System.out.println("Votes: " + state.getVotes());
@@ -27,7 +27,7 @@ public class JsonStateLoader {
                 .addWeight(ObjectiveCriteria.POPULATION_FAIRNESS, 0.3)
                 .build();
     }
-    private Set<Precinct> loadPrecincts(String fileName, int year) {
+    private Set<Precinct> loadPrecincts(String fileName) {
         String precinctsJson;
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             precinctsJson = br.lines().collect(Collectors.joining());
@@ -49,17 +49,19 @@ public class JsonStateLoader {
             precinct.setPerimeter((Double) attrs.get("perimeter"));
 
             // TODO rethink yearly votes
-            Map yearlyVotes = (Map) attrs.get("votes");
-            String yearString = String.valueOf(year);
-            Map<String, Integer> loadedVotes = (Map<String, Integer>) yearlyVotes.get(yearString);
-            Map<Party, Integer> votes = loadedVotes
-                    .keySet().stream()
-                    .collect(Collectors.toMap(
-                            Party::valueOf,
-                            loadedVotes::get,
-                            (a, b) -> a + b,
-                            LinkedHashMap::new
-                    ));
+            Map<String, Map<String, Integer>> yearlyVotes = (Map) attrs.get("votes");
+            Map<Integer, Map<Party, Integer>> votes = new LinkedHashMap<>();
+            yearlyVotes.forEach((yr, pVotes) -> {
+                Map<Party, Integer> partyVotes = pVotes
+                        .keySet().stream()
+                        .collect(Collectors.toMap(
+                                Party::valueOf,
+                                pVotes::get,
+                                (a, b) -> a + b,
+                                LinkedHashMap::new
+                        ));
+                votes.put(Integer.valueOf(yr), partyVotes);
+            });
 
             precinct.setVotes(votes);
 
@@ -125,26 +127,33 @@ public class JsonStateLoader {
         return new LinkedHashSet<>(distsFromId.values());
     }
 
-    public State getStateByShortName(String shortName, int year) {
+    public State getStateByShortName(String shortName) {
         String precinctsFile = String.format(PRECINCTS_FILE, shortName.toLowerCase());
         String neighborsFile = String.format(NEIGHBORS_FILE, shortName.toLowerCase());
 
-        Set<Precinct> precincts = loadPrecincts(precinctsFile, year);
+        Set<Precinct> precincts = loadPrecincts(precinctsFile);
         attachNeighbors(neighborsFile, precincts);
         Set<District> districts = attachDistricts(precincts);
 
         Integer statePopulation = 0;
-        Map<Party, Integer> stateVotes = new LinkedHashMap<>();
+        Map<Integer, Map<Party, Integer>> stateVotes = new LinkedHashMap<>();
         Map<Demographic, Integer> stateDemographics = new LinkedHashMap<>();
         for (District d : districts) {
             Integer population = d.getPopulation();
-            Map<Party, Integer> votes = d.getVotes();
+            Map<Integer, Map<Party, Integer>> votes = d.getVotes();
             Map<Demographic, Integer> demographics = d.getDemographics();
 
             statePopulation += population;
-            votes.forEach((party, count) -> {
-                stateVotes.merge(party, count, (total, partial) -> total + partial);
+
+            votes.forEach((yr, pvotes) -> {
+                stateVotes.merge(yr, pvotes, (currPVotes, newPVotes) -> {
+                    newPVotes.forEach((party, count) -> {
+                        currPVotes.merge(party, count, (total, partial) -> total + partial);
+                    });
+                    return currPVotes;
+                });
             });
+
             demographics.forEach((demographic, count) -> {
                 stateDemographics.merge(demographic, count, (total, partial) -> total + partial);
             });

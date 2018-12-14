@@ -48,7 +48,7 @@ public class MainController {
             state = mockStateLoader.loadMockState(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         }
         else if (JSON_LOAD) {
-            state = new JsonStateLoader().getStateByShortName(stateName, 2004);
+            state = new JsonStateLoader().getStateByShortName(stateName);
         }
         else {
             state = stateLoader.getStateByShortName(stateName);
