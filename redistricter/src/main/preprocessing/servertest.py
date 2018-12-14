@@ -8,12 +8,13 @@ ndists = 2
 
 startdata = \
 {
-    "state": f"MOCK {width} {ndists}",
+    "abbreviation": f"nh",
     "weights": {
-        "POLSBY_POPPER": 1.0,
-        "POPULATION_FAIRNESS": 0.0
+        "POLSBY_POPPER": 0.0,
+        "POPULATION_FAIRNESS": 1.0
     },
     "algorithm": "REGION_GROWING",
+    "districts": 4,
     "variation": "PROBABILISTIC_ACCEPT",
     "seed": 123456
 }
@@ -27,19 +28,19 @@ def select(state="NY"):
 
 def start(data=startdata):
     response = session.post('http://127.0.0.1:8080/start', json=data)
-    print(response.text)
+    # print(response.text)
     return json.loads(response.text)
 
 
 def next():
     response = session.post('http://127.0.0.1:8080/next')
-    print(response.text)
+    # print(response.text)
     if not response.text.strip():
         return {}
     return json.loads(response.text)
 
 
-def full_test():
+def mock_test():
     dists = start()
     i = 0
     while True:
@@ -68,8 +69,19 @@ def full_test():
         print('')
 
 
+def test():
+    start()
+    n = next()
+    objVal = 0.0
+    while n:
+        print(n)
+        objVal += n['objectiveDelta']
+        n = next()
+    return objVal
+
+
 def main():
-    full_test()
+    start()
 
 
 if __name__ == "__main__":
