@@ -13,11 +13,10 @@ import static giants.redistricter.algorithm.ObjectiveCriteria.*;
 public class ObjectiveFunction {
     private Map<ObjectiveCriteria, Double> weights;
     private Map<ObjectiveCriteria,Function<Set<District>,Double>> functions;
+    private int year;
 
-    // TODO build
-    private int year = 1998;
-
-    public ObjectiveFunction(Map<ObjectiveCriteria, Double> weights) {
+    public ObjectiveFunction(Map<ObjectiveCriteria, Double> weights, int year) {
+        this.year = year;
         this.weights = weights;
         functions = new LinkedHashMap<>();
         weights.forEach((obj,weight)->{

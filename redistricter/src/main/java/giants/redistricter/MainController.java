@@ -55,6 +55,8 @@ public class MainController {
         }
         Map<String, Double> weights = (Map) map.get("weights");
         ObjectiveFunctionBuilder objectiveBuilder = new ObjectiveFunctionBuilder();
+        //change the below line if needed.
+        objectiveBuilder.setYear(Integer.parseInt(String.valueOf(map.get("year"))));
         weights.forEach((criteria, weight) -> {
             objectiveBuilder.addWeight(ObjectiveCriteria.valueOf(criteria), weight);
         });
