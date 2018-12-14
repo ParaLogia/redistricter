@@ -1,15 +1,10 @@
 package giants.redistricter.data;
 
 public class Border {
-    Integer cost;
     Double length;
 
-    public Integer getCost() {
-        return cost;
-    }
-
-    public void setCost(Integer cost) {
-        this.cost = cost;
+    public Border(double length) {
+        this.length = length;
     }
 
     public Double getLength() {
@@ -19,4 +14,14 @@ public class Border {
     public void setLength(Double length) {
         this.length = length;
     }
+
+//    Integer cost;
+
+//    public Integer getCost() {
+//        return cost;
+//    }
+//
+//    public void setCost(Integer cost) {
+//        this.cost = cost;
+//    }
 }
