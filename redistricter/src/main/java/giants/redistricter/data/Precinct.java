@@ -36,7 +36,7 @@ public class Precinct {
     @Transient
     private  Map<Precinct,Border> neighbors;
     @Transient
-    private Map<Integer, Map<Party, Integer>> votes;
+    private Map<Integer,Map<Party, Integer>> votes;
     @Transient
     private Map<Demographic,Integer> demographics;
 
