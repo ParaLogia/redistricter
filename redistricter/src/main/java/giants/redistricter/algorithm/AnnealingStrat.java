@@ -51,6 +51,10 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
         // FIXME flawed logic
         srcDistrict = random.select(districts);
+        if (srcDistrict.getPrecincts().isEmpty()){
+            //I was gonna have a while statement to try to get more districts but it messes with the lambda statement down below.
+            return null;
+        }
         precinct = random.select(srcDistrict.getBorderPrecincts());
         Set<Precinct> neighbors = precinct.getNeighbors().keySet()
                 .stream()
