@@ -15,6 +15,8 @@ public class GrowingStrat extends AlgorithmStrategy {
     private Set<District> districts;
     private District precinctPool;
 
+    final int MAX_MOVE_POOL_SIZE = 150;
+
     public GrowingStrat(State state, ObjectiveFunction objFct,
                         Variation variation, RandomService random, int numSeeds){
         this.state = state;
@@ -96,6 +98,9 @@ public class GrowingStrat extends AlgorithmStrategy {
                         move.setPrecinct(precinctToAdd);
                         moves.add(move);
                     });
+            if (moves.size() > MAX_MOVE_POOL_SIZE) {
+                return moves;
+            }
         }
         return moves;
     }
