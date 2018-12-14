@@ -50,6 +50,11 @@ export class MapComponentComponent implements OnInit {
   public enablePrecinctToggle = false;
   public showPrecinctTable = false;
 
+  public colorsList = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', 
+                      '#f58231', '#911eb4', '#46f0f0', 
+                       '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', 
+                       '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#ffffff', '#000000' ]; 
+
   public geojson: any;
   public mymap: any;
 
@@ -181,12 +186,12 @@ export class MapComponentComponent implements OnInit {
       abbreviation: states.find(st => st.name === this.stateService.state.name)
         .abbreviation,
       weights: {
-        POPULATION_FAIRNESS:
-          this.adminService.selectedAlgorithm.populationFairness / 100,
-        POLSBY_POPPER: this.adminService.selectedAlgorithm.polsbyPopper / 100,
-        EFFICIENCY_GAP: this.adminService.selectedAlgorithm.efficencyGap / 100,
+        POPULATION_FAIRNESS:  this.adminService.selectedAlgorithm.populationFairness !== undefined ? 
+          this.adminService.selectedAlgorithm.populationFairness / 100 : 0.01,
+        POLSBY_POPPER: this.adminService.selectedAlgorithm.polsbyPopper !== undefined ? this.adminService.selectedAlgorithm.polsbyPopper / 100 : 0.01,
+        EFFICIENCY_GAP: this.adminService.selectedAlgorithm.efficencyGap !== undefined ? this.adminService.selectedAlgorithm.efficencyGap / 100 : 0.01,
         PROPORTIONALITY:
-          this.adminService.selectedAlgorithm.porportionality / 100
+          this.adminService.selectedAlgorithm.porportionality !== undefined ? this.adminService.selectedAlgorithm.porportionality / 100 : 0.01
       },
       algorithm: this.adminService.selectedAlgorithm.name,
       variation: this.adminService.selectedAlgorithm.variation,
@@ -219,7 +224,41 @@ export class MapComponentComponent implements OnInit {
     console.log("I HERE");
   }
 
-  public initializeDistricts(districtData: any) {}
+  public initializeDistricts(districtData: any) {
+    let districts = JSON.parse(districtData['_body']);
+    let i = 0;
+    districts.forEach(district => {
+      district.color = this.colorsList[i];
+      i = i + 1;
+
+      // Change all precinct colors
+      district.precincts.forEach(precinct => {
+        let startPrecinct = this.stateService.precinctJson.features.find(pre => pre.properties.id === precinct);
+        console.log(startPrecinct);
+        let polyline = L.polygon(this.processAnyCoordinates(startPrecinct.geometry.coordinates[0]), { color: district.color }).addTo(this.mymap);
+      });
+  
+    });
+
+    this.getNextMove();
+  }
+
+  public getNextMove() {
+    
+    this.http
+      .get(environment.apiBaseUrl + "/next")
+      .toPromise()
+      .then(
+        res => {
+          // Algo return set of districts
+          console.log(res);
+        },
+        // If an error occurs, log it
+        err => {
+          console.log("error: " + err);
+        }
+      );
+  }
 
   public changeStateGeo(e) {
     this.enablePrecinctToggle = true;
@@ -274,14 +313,37 @@ export class MapComponentComponent implements OnInit {
     return coords;
   }
 
+   public processAnyCoordinates(array: any): any[] {
+    // Process coordinates
+    let coords = [];
+    for (
+      var i = 0;
+      i < array.length;
+      i++
+    ) {
+      coords.push([
+        array[i][1],
+        array[i][0]
+      ]);
+    }
+
+    return coords;
+  }
+
   public toggleDisplayPrecincts(): void {
+    var selectedPrecinct = this.stateService.selectedPrecinct;
     this.showPrecinctTable = true;
-    let json = this.stateService.getPrecinctGeo(this.stateService.state.name);
-    if (json !== null) {
-      console.log(json);
-      let layer = L.geoJSON(json, {
+    this.stateService.precinctJson = this.stateService.getPrecinctGeo(this.stateService.state.name);
+    if (this.stateService.precinctJson !== null) {
+      console.log(this.stateService.precinctJson);
+      let layer = L.geoJSON(this.stateService.precinctJson, {
         onEachFeature: function(feature, layer) {
-          layer.on("click", function() {});
+          layer.on("mouseover", function() {
+            selectedPrecinct.id = feature.properties.id;
+            selectedPrecinct.population = feature.properties.population;
+            selectedPrecinct.democratVotes = Math.floor(feature.properties.votes['2016'].DEMOCRAT);
+            selectedPrecinct.republicanVotes = Math.floor((feature.properties.votes['2016'].REPUBLICAN));
+          });
         },
         style: {
           weight: 1,
@@ -290,19 +352,9 @@ export class MapComponentComponent implements OnInit {
           fillOpacity: 0.9
         }
       }).addTo(this.mymap);
-      // layer.bringToBack();
-    }
-
-    //   var start = new Date().getTime();
-    //   var end = start;
-    //   while(end < start + 3000) {
-    //     end = new Date().getTime();
-    //  }
-    this.stateService.selectedPrecinct.id = 137;
-    this.stateService.selectedPrecinct.districtId = 1;
-    this.stateService.selectedPrecinct.party = "Democrat";
 
     this.enablePrecinctToggle = false;
+  }
   }
 
   public search(): void {

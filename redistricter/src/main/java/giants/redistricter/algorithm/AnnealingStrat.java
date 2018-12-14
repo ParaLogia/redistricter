@@ -78,6 +78,39 @@ public class AnnealingStrat extends AlgorithmStrategy {
     }
 
     @Override
+    public boolean isAcceptable(Move move) {
+        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
+        currObjValDelta = currentObjValue - previousObjValue;
+        if (currObjValDelta >= bestDelta) {
+            bestDelta = currObjValDelta;
+            bestMove = moveHistory.getLast();
+        }
+        if (move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
+            switch (this.variation) {
+                case ANY_ACCEPT:
+                    return true;
+
+                case GREEDY_ACCEPT:
+                    assert movePool != null : "null movePool in isAcceptable()";
+                    return currObjValDelta > 0
+                            || movePool.isEmpty()
+                            && bestMove == moveHistory.getLast();
+
+                case PROBABILISTIC_ACCEPT:
+                    // TODO actual probability
+                    return previousObjValue == 0
+                            || currentObjValue / previousObjValue > temperature;
+
+                default:
+                    assert false : "Invalid Variation";
+                    return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public void acceptMove(Move move) {
         super.acceptMove(move);
         iterations++;
