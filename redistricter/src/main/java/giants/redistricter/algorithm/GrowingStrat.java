@@ -101,17 +101,6 @@ public class GrowingStrat extends AlgorithmStrategy {
     }
 
     @Override
-    public void acceptMove(Move move) {
-        move.setObjectiveDelta(currentObjValue - previousObjValue);
-        if (previousObjValue > currentObjValue) {
-            temperature -= COOLING_RATE;
-        }
-        previousObjValue = currentObjValue;
-        temperature -= COOLING_RATE;
-    }
-
-
-    @Override
     public boolean isComplete() {
         return precinctPool.getPrecincts().isEmpty();
     }

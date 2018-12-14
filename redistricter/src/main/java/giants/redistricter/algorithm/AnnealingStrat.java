@@ -79,12 +79,7 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
     @Override
     public void acceptMove(Move move) {
-        currObjValDelta = currentObjValue - previousObjValue;
-        move.setObjectiveDelta(currObjValDelta);
-        if (previousObjValue > currentObjValue) {
-            temperature -= COOLING_RATE;
-        }
-        previousObjValue = currentObjValue;
+        super.acceptMove(move);
         iterations++;
     }
 

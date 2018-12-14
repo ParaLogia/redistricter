@@ -28,7 +28,6 @@ public abstract class AlgorithmStrategy {
 
     abstract Set<District> getDistricts();
     abstract Deque<Move> generateMoves();
-    abstract void acceptMove(Move move);
     abstract boolean isComplete();
 
     public Move nextMove() {
@@ -45,17 +44,17 @@ public abstract class AlgorithmStrategy {
             executeMove(move);
             //contiguity might break it, remove if doesn't work.
             if (isAcceptable()) {
-                if (move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
+//                if (move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
                     acceptMove(move);
                     accepted = true;
-                }
-            } else {
+//                }
+            } else{
                 revertMove(move);
             }
             tries++;
-            if (tries >= max_tries) {
-                return null;
-            }
+//            if (tries >= max_tries) {
+//                return null;
+//            }
         }
         return move;
     }
@@ -67,7 +66,7 @@ public abstract class AlgorithmStrategy {
         if (movePool.isEmpty()) {
             return bestMove;
         }
-        return movePool.remove();
+        return movePool.removeFirst();
     }
     
     void executeMove(Move move) {
@@ -77,6 +76,7 @@ public abstract class AlgorithmStrategy {
 
         srcDistrict.removePrecinct(precinct);
         destDistrict.addPrecinct(precinct);
+        moveHistory.addLast(move);
     }
 
     void revertMove(Move move) {
@@ -86,17 +86,26 @@ public abstract class AlgorithmStrategy {
 
         srcDistrict.addPrecinct(precinct);
         destDistrict.removePrecinct(precinct);
+        moveHistory.removeLast();
     }
 
     public boolean isAcceptable() {
         currentObjValue = objFct.calculateObjectiveValue(getDistricts());
+        currObjValDelta = currentObjValue - previousObjValue;
+        if (currObjValDelta >= bestDelta) {
+            bestDelta = currObjValDelta;
+            bestMove = moveHistory.getLast();
+        }
+
         switch (this.variation) {
             case ANY_ACCEPT:
                 return true;
 
             case GREEDY_ACCEPT:
-                return currentObjValue > previousObjValue
-                        || movePool != null && movePool.isEmpty();
+                assert movePool != null : "null movePool in isAcceptable()";
+                return currObjValDelta > 0
+                        || movePool.isEmpty()
+                            && bestMove == moveHistory.getLast();
 
             case PROBABILISTIC_ACCEPT:
                 // TODO actual probability
@@ -107,5 +116,17 @@ public abstract class AlgorithmStrategy {
                 assert false : "Invalid Variation";
                 return false;
         }
+    }
+
+    public void acceptMove(Move move) {
+        move.setObjectiveDelta(currObjValDelta);
+        if (currObjValDelta > 0) {
+            temperature -= COOLING_RATE;
+        }
+        previousObjValue = currentObjValue;
+
+        movePool = null;
+        bestMove = null;
+        bestDelta = -Double.MAX_VALUE;
     }
 }
