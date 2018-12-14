@@ -12,14 +12,20 @@ public class UserPreferences {
     @Id
     @Column(name = "USERNAME")
     private String username;
-    @Column(name = "EQUAL_POP")
-    private Double equalPop;
-    @Column(name = "COMPACTNESS")
-    private Double compactness;
+    @Column(name = "MAXIMUM_DIFFERENCE")
+    private Double maximumDifference;
+    @Column(name = "MINIMUM_DIFFERENCE")
+    private Double minimumDifference;
     @Column(name = "EFFICIENCY_GAP")
     private Double efficiencyGap;
-    @Column(name = "PARTISON_FAIRNESS")
-    private Double partisonFairness;
+    @Column(name = "PROPORTIONALITY")
+    private Double proportionality;
+    @Column(name = "MEAN_MEDIAN_DIFFERENCE")
+    private Double meanMedianDifference;
+    @Column(name = "POLSBY_POPPER")
+    private Double polsbyPopper;
+    @Column(name = "SHWARTZBERG")
+    private Double shwartzberg;
     
     public UserPreferences(){    
     }
@@ -32,20 +38,20 @@ public class UserPreferences {
         this.username = username;
     }
 
-    public Double getEqualPop() {
-        return equalPop;
+    public Double getMaximumDifference() {
+        return maximumDifference;
     }
 
-    public void setEqualPop(Double equalPop) {
-        this.equalPop = equalPop;
+    public void setMaximumDifference(Double maximumDifference) {
+        this.maximumDifference = maximumDifference;
     }
 
-    public Double getCompactness() {
-        return compactness;
+    public Double getMinimumDifference() {
+        return minimumDifference;
     }
 
-    public void setCompactness(Double compactness) {
-        this.compactness = compactness;
+    public void setMinimumDifference(Double minimumDifference) {
+        this.minimumDifference = minimumDifference;
     }
 
     public Double getEfficiencyGap() {
@@ -56,16 +62,36 @@ public class UserPreferences {
         this.efficiencyGap = efficiencyGap;
     }
 
-    public Double getPartisonFairness() {
-        return partisonFairness;
+    public Double getProportionality() {
+        return proportionality;
     }
 
-    public void setPartisonFairness(Double partisonFairness) {
-        this.partisonFairness = partisonFairness;
+    public void setProportionality(Double proportionality) {
+        this.proportionality = proportionality;
     }
-    
-    
-    
-    
+
+    public Double getMeanMedianDifference() {
+        return meanMedianDifference;
+    }
+
+    public void setMeanMedianDifference(Double meanMedianDifference) {
+        this.meanMedianDifference = meanMedianDifference;
+    }
+
+    public Double getPolsbyPopper() {
+        return polsbyPopper;
+    }
+
+    public void setPolsbyPopper(Double polsbyPopper) {
+        this.polsbyPopper = polsbyPopper;
+    }
+
+    public Double getShwartzberg() {
+        return shwartzberg;
+    }
+
+    public void setShwartzberg(Double shwartzberg) {
+        this.shwartzberg = shwartzberg;
+    }
     
 }
