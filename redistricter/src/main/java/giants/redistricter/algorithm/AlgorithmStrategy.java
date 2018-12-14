@@ -58,7 +58,6 @@ public abstract class AlgorithmStrategy {
     }
 
     public Move generateMove() {
-        System.err.println("generateMove");
         if (movePool == null) {
             movePool = generateMoves();
         }
@@ -69,7 +68,6 @@ public abstract class AlgorithmStrategy {
     }
     
     void executeMove(Move move) {
-        System.err.println("executeMove");
         District srcDistrict = move.getSourceDistrict();
         District destDistrict = move.getDestinationDistrict();
         Precinct precinct = move.getPrecinct();
@@ -80,7 +78,6 @@ public abstract class AlgorithmStrategy {
     }
 
     void revertMove(Move move) {
-        System.err.println("revertMove");
         District srcDistrict = move.getSourceDistrict();
         District destDistrict = move.getDestinationDistrict();
         Precinct precinct = move.getPrecinct();
@@ -91,7 +88,6 @@ public abstract class AlgorithmStrategy {
     }
 
     public void acceptMove(Move move) {
-        System.err.println("acceptMove");
         move.setObjectiveDelta(currObjValDelta);
         if (currObjValDelta > 0) {
             temperature -= COOLING_RATE;

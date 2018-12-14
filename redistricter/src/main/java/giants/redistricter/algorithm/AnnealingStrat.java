@@ -47,7 +47,6 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
     @Override
     public Deque<Move> generateMoves() {
-        System.err.println("genMoves pre");
         Deque<Move> moves = new LinkedList<>();
 
         boolean badDist = true;
@@ -72,13 +71,11 @@ public class AnnealingStrat extends AlgorithmStrategy {
                             });
                 });
 
-        System.err.println("genMoves post");
         return moves;
     }
 
     @Override
     public boolean isAcceptable(Move move) {
-        System.err.println("isAcceptable");
         currentObjValue = objFct.calculateObjectiveValue(getDistricts());
         currObjValDelta = currentObjValue - previousObjValue;
         if (currObjValDelta >= bestDelta) {
@@ -111,7 +108,6 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
     @Override
     public void acceptMove(Move move) {
-        System.err.println("acceptMove");
         super.acceptMove(move);
         System.err.println(currentObjValue);
         iterations++;
@@ -119,7 +115,6 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
     @Override
     public boolean isComplete() {
-        System.err.println("isComplete");
         return iterations > MAX_ITERATIONS;
     }
 }
