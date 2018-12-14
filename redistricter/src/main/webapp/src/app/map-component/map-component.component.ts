@@ -154,10 +154,6 @@ export class MapComponentComponent implements OnInit {
           }
         });
 
-        function hello() {
-          console.log("hello");
-        }
-
         function processCoord(coords) {
           let coords1 = [];
           for (var i = 0; i < coords[0].length; i++) {
@@ -314,6 +310,7 @@ public search(): void {
         (res) => {
           // Populate state data from backend
          console.log( JSON.parse(res['_body'])[0]['lat'] );
+         console.log( JSON.parse(res['_body'])[0]['lon'] );
         },
         // If an error occurs, log it
         err => {
