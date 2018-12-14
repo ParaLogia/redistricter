@@ -50,7 +50,7 @@ public class StateLoaderService {
             attachPrecinctsToDistrict(d);
             state.setPopulation(d.getPopulation() + state.getPopulation());
         }
-        state.setDistricts(new HashSet<District>());
+        state.setDistricts(new HashSet<District>(districts));
     }
     
     private void attachPrecinctsToDistrict(District d){
