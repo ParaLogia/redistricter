@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 
+import { states } from "./models/states";
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { HttpHeaders } from '@angular/common/http';
 
@@ -76,13 +77,12 @@ export class StateService {
     let httpHeaders = new HttpHeaders();
     httpHeaders.append('Access-Control-Allow-Origin', '*');
 
-    let httpParams = new HttpParams();
-    httpParams.append('state', 'New York');
+    let stateParam = states.find(st => st.name === name).abbreviation
 
     this.http
       .get('http://localhost:8080/select', {
         headers: httpHeaders,
-        params: httpParams
+        params: {'state' : stateParam}
       })
       .toPromise()
       .then(
