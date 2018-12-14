@@ -50,6 +50,8 @@ export class MapComponentComponent implements OnInit {
   public enablePrecinctToggle = false;
   public showPrecinctTable = false;
 
+  public districtsList = [];
+
   public colorsList = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', 
                       '#f58231', '#911eb4', '#46f0f0', 
                        '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', 
@@ -195,7 +197,8 @@ export class MapComponentComponent implements OnInit {
       },
       algorithm: this.adminService.selectedAlgorithm.name,
       variation: this.adminService.selectedAlgorithm.variation,
-      seed: 12345
+      seed: 12345,
+      year: '2016'
     };
 
     console.log(algorithmInfo);
@@ -225,9 +228,9 @@ export class MapComponentComponent implements OnInit {
   }
 
   public initializeDistricts(districtData: any) {
-    let districts = JSON.parse(districtData['_body']);
+    this.districtsList = JSON.parse(districtData['_body']);
     let i = 0;
-    districts.forEach(district => {
+    this.districtsList.forEach(district => {
       district.color = this.colorsList[i];
       i = i + 1;
 
@@ -251,14 +254,26 @@ export class MapComponentComponent implements OnInit {
       .then(
         res => {
           // Algo return set of districts
-          console.log(res);
+          let precinct = JSON.parse(res['_body']);
+          if (precinct !== null) {
+          let precinctDTO = this.stateService.precinctJson.features.find(pre => pre.properties.id === precinct.precinct);
+
+          let districtColor = this.districtsList.find(dist => dist.id === precinct.destinationDistrict).color;
+
+          console.log(districtColor);
+          let polyline = L.polygon(this.processAnyCoordinates(precinctDTO.geometry.coordinates[0]), { color: districtColor }).addTo(this.mymap);
+
+          this.getNextMove();
+          } 
+
         },
         // If an error occurs, log it
         err => {
           console.log("error: " + err);
         }
       );
-  }
+        }
+  
 
   public changeStateGeo(e) {
     this.enablePrecinctToggle = true;
