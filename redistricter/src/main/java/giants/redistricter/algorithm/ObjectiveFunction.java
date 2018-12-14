@@ -72,6 +72,10 @@ public class ObjectiveFunction {
             total = total + polsyPopper;
         }
         total = (total / districts.size());
+
+        if (total > 1.0) {
+            throw new IllegalStateException("Polsby-Popper too high: " + total);
+        }
         return total;
     }
 
@@ -113,6 +117,10 @@ public class ObjectiveFunction {
             total += Math.abs((populationPerDistrict - district.getPopulation()));
         }
         total = 1.0 - total/totalPopulation;
+
+        if (total > 1.0) {
+            throw new IllegalStateException("Population fairness too high: " + total);
+        }
         return total;
     }
     private double calculateEfficiencyGap(Set<District> districts){
@@ -137,6 +145,10 @@ public class ObjectiveFunction {
         }
         total = total/districts.size();
         //higher is better score.
+
+        if (total > 1.0) {
+            throw new IllegalStateException("Efficiency gap too high: " + total);
+        }
         return total;
     }
     private double partisanFairness(Set<District> districts){
@@ -183,6 +195,10 @@ public class ObjectiveFunction {
         double out = Math.abs(demoWinStat-demoVotesStat);
         out += Math.abs(repWinStat-repVotesStat);
         out = 1-out;
+
+        if (out > 1.0) {
+            throw new IllegalStateException("Proportionality too high: " + out);
+        }
         return out;
     }
 }

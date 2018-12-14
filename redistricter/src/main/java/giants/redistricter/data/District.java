@@ -200,6 +200,7 @@ public class District {
         boolean borderPrecinct = false;
         //don't add for remove, or it might break some other code. Just becareful.
         precinct.setDistrict(this);
+        precinct.setDistrictId(this.districtId);
 
         precincts.add(precinct);
         this.population += population;
