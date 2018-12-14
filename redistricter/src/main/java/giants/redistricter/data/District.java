@@ -280,6 +280,7 @@ public class District {
         borderP.addAll(borderPrecincts);
 
         boolean visited[] = new boolean[borderP.size()];
+        visited[borderP.indexOf(precinct)]=true;
         visited = bigPrecinctDFS(borderP,borderP.get(0),visited);
 
         boolean check = true;
