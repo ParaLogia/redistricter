@@ -34,13 +34,16 @@ public class UserService {
         return true;
     }
     
-    public boolean verifyUser(User user) {
+    public User verifyUser(User user) {
         EntityManager em = factory.createEntityManager();
         User toVerify = em.find(User.class, user.getUsername());
         if(toVerify == null) {
-            return false;
+            return null;
         }
-        return BCrypt.checkpw(user.getPassword(), toVerify.getPassword());
+        if(BCrypt.checkpw(user.getPassword(), toVerify.getPassword()) == true) {
+            return toVerify;
+        }
+        return null;
     }
     
     public boolean deleteUser(User user) {
