@@ -20,7 +20,7 @@ public class GrowingStrat extends AlgorithmStrategy {
     double currentObjValue;
 
     public GrowingStrat(State state, ObjectiveFunction objFct,
-                        Variation variation, RandomService random){
+                        Variation variation, RandomService random, int numSeeds){
         this.state = state;
         this.objFct = objFct;
         this.variation = variation;
@@ -30,19 +30,47 @@ public class GrowingStrat extends AlgorithmStrategy {
         temperature = 1.0;
 
         precinctPool.addPrecincts(precincts);
-        initSeeds();
+        initSeeds(numSeeds);
 
         currentObjValue = objFct.calculateObjectiveValue(districts);
     }
 
-    private void initSeeds(){
+    private void initSeeds(int numSeeds) {
+        if (numSeeds < 2) {
+            throw new IllegalArgumentException("Too few district seeds: " + numSeeds);
+        }
+        if (numSeeds > state.getDistricts().size()*2) {
+            throw new IllegalArgumentException("Too many district seeds: " + numSeeds);
+        }
+
         districts = new LinkedHashSet<>();
-        for (District origDist : state.getDistricts()) {
-            District district = new District(origDist.getDistrictId());
-            Precinct seed = random.select(origDist.getPrecincts());
-            district.addPrecinct(seed);
-            precinctPool.removePrecinct(seed);
-            districts.add(district);
+
+        while (numSeeds > 0) {
+            for (District origDist : state.getDistricts()) {
+                int id = numSeeds;
+                District district = new District(id);
+
+                Precinct seed = null;
+                boolean badSeed = true;
+                while (badSeed) {
+                    seed = random.select(origDist.getPrecincts());
+                    badSeed = districts.contains(seed.getDistrict());
+                    for (Precinct neighbor : seed.getNeighbors().keySet()) {
+                        if (districts.contains(neighbor.getDistrict())) {
+                            badSeed = true;
+                            break;
+                        }
+                    }
+                }
+
+                seed.setDistrictId(id);
+                seed.setDistrict(district);
+                district.addPrecinct(seed);
+                precinctPool.removePrecinct(seed);
+
+                districts.add(district);
+                numSeeds--;
+            }
         }
     }
 

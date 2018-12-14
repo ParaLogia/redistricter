@@ -21,13 +21,13 @@ public class AlgorithmService {
     ObjectiveFunction objFct;
 
     public Set<District> start(State state, ObjectiveFunction objFct,
-                               AlgorithmType alg, Variation vari){
+                               AlgorithmType alg, Variation vari, int districts){
         this.state = state;
         this.objFct = objFct;
 
         switch (alg) {
             case REGION_GROWING:
-                strategy = new GrowingStrat(state, objFct, vari, randomService);
+                strategy = new GrowingStrat(state, objFct, vari, randomService, districts);
                 break;
             case SIMULATED_ANNEALING:
                 strategy = new AnnealingStrat(state, objFct, vari, randomService);
