@@ -24,13 +24,16 @@ public class MockStateLoader {
         State state;
         state = new MockStateLoader().getStateByShortName("ny", 1998);
 
+        System.out.println("Name: " + state.getName());
+        System.out.println("Votes: " + state.getVotes());
+
         ObjectiveFunction objective = new ObjectiveFunctionBuilder()
-                .addWeight(ObjectiveCriteria.POLSBY_POPPER, 0.0)
-                .addWeight(ObjectiveCriteria.POPULATION_FAIRNESS, 1.0)
+                .addWeight(ObjectiveCriteria.POLSBY_POPPER, 0.7)
+                .addWeight(ObjectiveCriteria.POPULATION_FAIRNESS, 0.3)
                 .build();
 
-        for (int i = 0; i < 100; i++)
-        System.out.println("Obj val: "+objective.calculateObjectiveValue(state.getDistricts()));
+//        for (int i = 0; i < 100; i++)
+//        System.out.println("Obj val: "+objective.calculateObjectiveValue(state.getDistricts()));
     }
 
 
@@ -81,7 +84,6 @@ public class MockStateLoader {
                     ));
 
             precinct.setDemographics(demographics);
-            System.out.println(demographics);
 
             precincts.add(precinct);
         }
@@ -141,15 +143,33 @@ public class MockStateLoader {
         attachNeighbors(neighborsFile, precincts);
         Set<District> districts = attachDistricts(precincts);
 
+        Integer statePopulation = 0;
+        Map<Party, Integer> stateVotes = new LinkedHashMap<>();
+        Map<Demographic, Integer> stateDemographics = new LinkedHashMap<>();
         for (District d : districts) {
-            System.out.println("id: "+d.getDistrictId());
-            System.out.println("demographics: "+d.getDemographics());
-            System.out.println("votes: "+d.getVotes());
+            Integer population = d.getPopulation();
+            Map<Party, Integer> votes = d.getVotes();
+            Map<Demographic, Integer> demographics = d.getDemographics();
+
+            statePopulation += population;
+            votes.forEach((party, count) -> {
+                stateVotes.merge(party, count, (total, partial) -> total + partial);
+            });
+            demographics.forEach((demographic, count) -> {
+                stateDemographics.merge(demographic, count, (total, partial) -> total + partial);
+            });
         }
 
+        final Map<String, String> STATE_NAMES = new HashMap<>();
+        STATE_NAMES.put("NY", "New York");
+        STATE_NAMES.put("NH", "New Hampshire");
+        STATE_NAMES.put("CO", "Colorado");
+
         State state = new State();
-        state.setName(shortName);
-        state.setShortName(shortName);
+        state.setName(shortName.toUpperCase());
+        state.setShortName(STATE_NAMES.get(shortName.toUpperCase()));
+        state.setPopulation(statePopulation);
+        state.setVotes(stateVotes);
         state.setPrecincts(precincts);
         state.setDistricts(districts);
         return state;
