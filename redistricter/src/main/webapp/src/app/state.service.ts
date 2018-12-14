@@ -34,7 +34,7 @@ export class StateService {
         return require('../assets/districts/co_dists_geo.json');
       }
       case 'New Hampshire': {
-        return require('../assets/districts/nh_precincts_final.json');
+        return require('../assets/districts/nh_dists.json');
       }
       case 'New York': {
         return require('../assets/districts/ny_dists_geo.json');
