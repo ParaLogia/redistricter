@@ -64,11 +64,29 @@ public class StateLoaderService {
         d.setPerimeter(0.0);
         for(Precinct p : precincts) {
             attachDemographicsToPrecinct(p);
+            attachVotesToPrecinct(p);
             d.setPopulation(p.getPopulation() + d.getPopulation());
             d.setArea(d.getArea()+p.getArea());
             d.setPerimeter(d.getPerimeter()+p.getPerimeter());
         }
         d.setPrecincts(new HashSet<Precinct>(precincts));
+    }
+
+    private void attachVotesToPrecinct(Precinct p) {
+        List<Vote> votes = dbService.getVotesByPrecinctId(p.getId());
+        Map<Map<Integer, Party>, Integer> votesMap = new HashMap<Map<Integer, Party>, Integer>();
+        
+        Map<Integer, Party> subMap;
+        Party party;
+        int year;
+        for(Vote v : votes) {
+            subMap = new HashMap<Integer, Party>();
+            party = Party.valueOf(v.getParty());
+            year = v.getYear();
+            subMap.put(v.getYear(), party);
+            votesMap.put(subMap, v.getVotes());
+        }
+        p.setVotes(votesMap); 
     }
 
     private void attachDemographicsToPrecinct(Precinct p) {

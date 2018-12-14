@@ -12,6 +12,7 @@ import giants.redistricter.data.Demographics;
 import giants.redistricter.data.District;
 import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
+import giants.redistricter.data.Vote;
 
 
 @Service
@@ -46,6 +47,10 @@ public class DatabaseService {
     
     public List<Demographics> getDemographicsByPrecinctId(Integer precinctId){
         return em.createQuery("SELECT demographic FROM Demographics demographic where demographic.precinctId = :value1", Demographics.class).setParameter("value1", precinctId).getResultList();
+    }
+    
+    public List<Vote> getVotesByPrecinctId(Integer precinctId){
+        return em.createQuery("SELECT votes FROM Vote votes where votes.precinctId = :value1", Vote.class).setParameter("value1", precinctId).getResultList();
     }
 		
 }
