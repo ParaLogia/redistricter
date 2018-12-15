@@ -10,7 +10,7 @@ import java.util.Random;
 import java.util.Set;
 
 @Component
-@Scope(value="session")
+@Scope(value="application")
 public class AlgorithmService {
 
     @Autowired

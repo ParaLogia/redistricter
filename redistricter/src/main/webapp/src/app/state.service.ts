@@ -52,10 +52,10 @@ export class StateService {
         return require('../assets/precincts/co_precincts.json');
       }
       case 'New Hampshire': {
-        return require('../assets/precincts/nh_geo.json');
+        return require('../assets/precincts/nh_precincts.json');
       }
       case 'New York': {
-        return require('../assets/precincts/ny_geo.json');
+        return require('../assets/precincts/ny_precincts.json');
       }
       default: {
         return null;

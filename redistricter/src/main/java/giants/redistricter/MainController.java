@@ -12,7 +12,7 @@ import java.util.Set;
 
 
 @RestController
-@Scope(value="session")
+@Scope(value="application")
 public class MainController {
     // TODO Remove once we get the database running
     final boolean JSON_LOAD = true;

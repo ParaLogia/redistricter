@@ -77,6 +77,7 @@ export class MapComponentComponent implements OnInit {
     // Initialize map
     var mapvar = (this.mymap = L.map("mapid").setView([37.8, -96], 4));
     var stateService = this.stateService;
+    var toggle = this.enablePrecinctToggle;
 
     L.tileLayer(
       "https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}",
@@ -144,6 +145,7 @@ export class MapComponentComponent implements OnInit {
           }).addTo(mapvar);
           mapvar.fitBounds(polyline.getBounds());
 
+          toggle = true;
           // Set districts if applicable
           let json = stateService.setState(feature.properties.name);
           console.log(json);
@@ -368,7 +370,6 @@ export class MapComponentComponent implements OnInit {
         }
       }).addTo(this.mymap);
 
-    this.enablePrecinctToggle = false;
   }
   }
 
