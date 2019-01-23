@@ -15,8 +15,10 @@ public abstract class AlgorithmStrategy {
     State state;
     ObjectiveFunction objFct;
     Variation variation;
-    double temperature;
+    Set<District> districts;
+    RandomService random;
 
+    double temperature = 1.0;
     double currentObjValue = 0.0;
     double previousObjValue = 0.0;
     double currObjValDelta = Double.MAX_VALUE;
@@ -29,7 +31,37 @@ public abstract class AlgorithmStrategy {
     abstract Set<District> getDistricts();
     abstract Deque<Move> generateMoves();
     abstract boolean isComplete();
-    abstract boolean isAcceptable(Move move);
+
+    public boolean isAcceptable(Move move) {
+        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
+        currObjValDelta = currentObjValue - previousObjValue;
+        if (currObjValDelta >= bestDelta) {
+            bestDelta = currObjValDelta;
+            bestMove = moveHistory.getLast();
+        }
+
+        switch (this.variation) {
+            case ANY_ACCEPT:
+                return true;
+
+            case GREEDY_ACCEPT:
+                assert movePool != null : "null movePool in isAcceptable()";
+                return currObjValDelta > 0
+                        || movePool.isEmpty()
+                        && bestMove == moveHistory.getLast();
+
+            case PROBABILISTIC_ACCEPT:
+                return previousObjValue == 0
+                        || currObjValDelta > 0
+                        || currentObjValue / previousObjValue < random.nextDouble()*temperature
+                        || movePool.isEmpty()
+                        && bestMove == moveHistory.getLast();
+
+            default:
+                assert false : "Invalid Variation";
+                return false;
+        }
+    }
 
     public Move nextMove() {
         Move move = null;

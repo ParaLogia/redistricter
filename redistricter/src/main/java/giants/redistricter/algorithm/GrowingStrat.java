@@ -3,15 +3,11 @@ package giants.redistricter.algorithm;
 import giants.redistricter.data.District;
 import giants.redistricter.data.Precinct;
 import giants.redistricter.data.State;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class GrowingStrat extends AlgorithmStrategy {
-    @Autowired
-    private RandomService random;
-
     private Set<District> districts;
     private District precinctPool;
 
@@ -25,7 +21,6 @@ public class GrowingStrat extends AlgorithmStrategy {
         this.random = random;
         Set<Precinct> precincts = state.getPrecincts();
         precinctPool = new District(-1);
-        temperature = 1.0;
 
         precinctPool.addPrecincts(precincts);
         initSeeds(numSeeds);
@@ -74,38 +69,6 @@ public class GrowingStrat extends AlgorithmStrategy {
                     break;
                 }
             }
-        }
-    }
-
-    @Override
-    public boolean isAcceptable(Move move) {
-        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
-        currObjValDelta = currentObjValue - previousObjValue;
-        if (currObjValDelta >= bestDelta) {
-            bestDelta = currObjValDelta;
-            bestMove = moveHistory.getLast();
-        }
-
-        switch (this.variation) {
-            case ANY_ACCEPT:
-                return true;
-
-            case GREEDY_ACCEPT:
-                assert movePool != null : "null movePool in isAcceptable()";
-                return currObjValDelta > 0
-                        || movePool.isEmpty()
-                        && bestMove == moveHistory.getLast();
-
-            case PROBABILISTIC_ACCEPT:
-                return previousObjValue == 0
-                        || currObjValDelta > 0
-                        || currentObjValue / previousObjValue < random.nextDouble()*temperature
-                        || movePool.isEmpty()
-                        && bestMove == moveHistory.getLast();
-
-            default:
-                assert false : "Invalid Variation";
-                return false;
         }
     }
 

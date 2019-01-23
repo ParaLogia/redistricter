@@ -9,19 +9,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AnnealingStrat extends AlgorithmStrategy {
-
-    @Autowired
-    RandomService random;
-
-    Set<District> districts;
     int iterations = 0;
     final int MAX_ITERATIONS = 5000;
     int losingStreak = 0;
     final int MAX_LOSING_STREAK = 50;
-    final double CONVERGED_DELTA_VAL = 0.01;
-    double past_objective = 0.0;
-    double temperature = 1.0;
-    List<Move> moves;
 
     public AnnealingStrat(State state, ObjectiveFunction objFct,
                           Variation variation, RandomService random){
@@ -79,36 +70,13 @@ public class AnnealingStrat extends AlgorithmStrategy {
 
     @Override
     public boolean isAcceptable(Move move) {
-        currentObjValue = objFct.calculateObjectiveValue(getDistricts());
-        currObjValDelta = currentObjValue - previousObjValue;
-        if (currObjValDelta >= bestDelta) {
-            bestDelta = currObjValDelta;
-            bestMove = moveHistory.getLast();
+        if (!super.isAcceptable(move)) {
+            return false;
         }
-//        if (move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
+//        if (!move.getSourceDistrict().isContiguousWithChange(move.getPrecinct())) {
 //            return false;
 //        }
-        switch (this.variation) {
-            case ANY_ACCEPT:
-                return true;
-
-            case GREEDY_ACCEPT:
-                assert movePool != null : "null movePool in isAcceptable()";
-                return currObjValDelta > 0
-                        || movePool.isEmpty()
-                        && bestMove == moveHistory.getLast();
-
-            case PROBABILISTIC_ACCEPT:
-                return previousObjValue == 0
-                        || currObjValDelta > 0
-                        || currentObjValue / previousObjValue < random.nextDouble()*temperature
-                        || movePool.isEmpty()
-                        && bestMove == moveHistory.getLast();
-
-            default:
-                assert false : "Invalid Variation";
-                return false;
-        }
+        return true;
     }
 
     @Override
