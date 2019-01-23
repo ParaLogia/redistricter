@@ -47,7 +47,7 @@ export class MapComponentComponent implements OnInit {
 
   public statesData: any;
 
-  public enablePrecinctToggle = false;
+  public enablePrecinctToggle = true;
   public showPrecinctTable = false;
 
   public districtsList = [];
