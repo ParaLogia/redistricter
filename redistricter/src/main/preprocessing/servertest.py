@@ -1,67 +1,39 @@
+# Quick and dirty script to hit the server endpoint
+# We used Postman after we found out about that
+
 import requests
-import json
-from collections import defaultdict
-
-session = requests.Session()
-
 
 startdata = \
 {
-    'abbreviation': 'co',
-    'weights': {
-        'POLSBY_POPPER': 0.5,
-        'POPULATION_FAIRNESS': 0.5
+    "state": "NY",
+    "weights": {
+        "POLSBY_POPPER": 0.3,
+        "POPULATION_FAIRNESS": 0.7
     },
-    'algorithm': 'SIMULATED_ANNEALING',
-    'districts': 2,
-    'variation': 'PROBABILISTIC_ACCEPT',
-    'seed': 43543,
-    'year': 2000
+    "algorithm": "REGION_GROWING",
+    "variation": "GREEDY_ACCEPT",
+    "seed": 12356
 }
-
 
 
 def select(state="NY"):
     data = {"state": state}
-    response = session.post('http://127.0.0.1:8080/select', data=data)
+    response = requests.post('http://127.0.0.1:8080/select', data=data)
     print(response.text)
 
 
 def start(data=startdata):
-    response = session.post('http://127.0.0.1:8080/start', json=data)
-    # print(response.text)
-    return json.loads(response.text)
+    response = requests.post('http://127.0.0.1:8080/start', json=data)
+    print(response.text)
 
 
 def next():
-    response = session.post('http://127.0.0.1:8080/next')
-    # print(response.text)
-    if not response.text.strip():
-        return {}
-    return json.loads(response.text)
-
-
-dists = defaultdict(list)
-
-def test():
-    global dists
-    start()
-    n = next()
-    objVal = 0.0
-    i = 0
-    while n:
-        if i % 500 == 0 or n['objectiveDelta'] > 0.5:
-            print(i)
-            print('    ', n)
-        i += 1
-        objVal += n['objectiveDelta']
-        dists[n['destinationDistrict']].append(n['precinct'])
-        n = next()
-    return objVal
+    response = requests.post('http://127.0.0.1:8080/next')
+    print(response.text)
 
 
 def main():
-    start()
+    select()
 
 
 if __name__ == "__main__":

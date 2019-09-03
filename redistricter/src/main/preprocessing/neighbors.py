@@ -1,3 +1,5 @@
+# Computes adjacencies between precincts
+
 from shapely.geometry import shape as Shape, MultiLineString, mapping
 from shapely.ops import cascaded_union
 from shapely.strtree import STRtree
@@ -7,9 +9,9 @@ from sys import setrecursionlimit
 
 setrecursionlimit(2000)
 
-STATE = 'co'
-PRECINCTS_FILE = '../precincts/{}_geo.json'.format(STATE)
-NEIGHBORS_FILE = '../neighbors/{}_neighbors.json'.format(STATE)
+STATE = 'nh'
+PRECINCTS_FILE = '../precincts/{}_precincts.json'.format(STATE)
+NEIGHBORS_FILE = '../neighbors/{}_neighborders.json'.format(STATE)
 EXTERIOR_FILE = '../neighbors/{}_exterior.json'.format(STATE)
 INTERIOR_FILE = '../neighbors/{}_interior.json'.format(STATE)
 
@@ -27,11 +29,11 @@ def loadshapes(infile):
     return shapes
 
 
-def findneighbors(shapes):
+def findneighbors(shapes, sort=False):
     # Fast query tree
     strtree = STRtree(shapes)
 
-    neighbors = defaultdict(list)
+    neighbors = defaultdict(dict)
     explored = set()
     edges = 0
     for p1 in shapes:
@@ -39,18 +41,21 @@ def findneighbors(shapes):
         nearby = (p for p in strtree.query(p1) if p.pcode not in explored)
 
         for p2 in nearby:
-            if p1.relate_pattern(p2, '****1****'):
-                n1, n2 = p1.pcode, p2.pcode
-                neighbors[n1].append(n2)
-                neighbors[n2].append(n1)
+            if p2.pcode not in neighbors[p1.pcode]:
+                if p1.relate_pattern(p2, '****1****'):
+                    border = p1.intersection(p2)
+                    n1, n2 = p1.pcode, p2.pcode
+                    neighbors[n1][n2] = border.length
+                    neighbors[n2][n1] = border.length
 
-                if edges % 1000 == 0:
-                    print(edges, 'edges')
-                edges += 1
+                    if edges % 1000 == 0:
+                        print(edges, 'edges')
+                    edges += 1
     print('Total edges:', edges)
 
-    for p in neighbors:
-        neighbors[p] = sorted(neighbors[p])
+    if sort:
+        for p in neighbors:
+            neighbors[p] = {n: b for n, b in sorted(neighbors[p].items())}
     return neighbors
 
 
@@ -107,17 +112,21 @@ def borders(shapes, neighbors):
 def main():
     print('loading precincts...')
     shapes = loadshapes(PRECINCTS_FILE)
-    print('loading neighbors...')
-    with open(NEIGHBORS_FILE, 'r') as f:
-        neighbors = json.load(f)
+    # print('loading neighbors...')
+    # with open(NEIGHBORS_FILE, 'r') as infile:
+    #     neighbors = json.load(infile)
     print('loading complete.')
 
-    interior, exterior = borders(shapes, neighbors)
-    with open(INTERIOR_FILE, 'w') as f:
-        bounds = [mapping(boundary) for boundary in interior]
-        features = [{'type': 'Feature', 'geometry': bound} for bound in bounds]
-        geojson = {'type': 'FeatureCollection', 'features': features}
-        json.dump(geojson, f)
+    neighbors = findneighbors(shapes)
+    with open(NEIGHBORS_FILE, 'w') as f:
+        json.dump(neighbors, f)
+
+    # interior, exterior = borders(shapes, neighbors)
+    # with open(INTERIOR_FILE, 'w') as infile:
+    #     bounds = [mapping(boundary) for boundary in interior]
+    #     features = [{'type': 'Feature', 'geometry': bound} for bound in bounds]
+    #     geojson = {'type': 'FeatureCollection', 'features': features}
+    #     json.dump(geojson, infile)
 
 
 if __name__ == '__main__':
